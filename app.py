@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from flask import Flask, redirect, render_template, request, url_for
-from flask_sqlalchemy import SQLAlchemy
+from models import db, Contato, Tarefa
 
 app = Flask(__name__)
 
@@ -11,22 +11,10 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 
-# ---------- Modelos ----------
 
-class Tarefa(db.Model):
-    """Tarefa com descrição, prazo, prioridade e status."""
-
-    id = db.Column(db.Integer, primary_key=True)
-    descricao = db.Column(db.String(200), nullable=False)
-    prazo = db.Column(db.Date, nullable=True)
-    prioridade = db.Column(db.String(10), nullable=False, default="media")
-    status = db.Column(db.String(20), nullable=False, default="pendente")
-
-    def __repr__(self):
-        return f"<Tarefa {self.id}: {self.descricao}>"
 
 
 # Cria as tabelas automaticamente na inicialização do app
