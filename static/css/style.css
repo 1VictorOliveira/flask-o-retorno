@@ -1,0 +1,166 @@
+/* =========================================================
+   Gestão de Contatos e Tarefas - estilo base
+   Bootstrap 5 cuida do grid e dos componentes;
+   aqui ficam só a identidade visual e os tokens do projeto.
+   ========================================================= */
+
+:root {
+    /* Base */
+    --app-ink: #1d3445;          /* navbar, títulos */
+    --app-ink-soft: #2c4a5f;
+    --app-bg: #f3f5f7;           /* fundo da página */
+    --app-surface: #ffffff;      /* cards, tabelas */
+    --app-border: #dde3e8;
+    --app-muted: #66788a;
+    --app-accent: #e9a23b;       /* botão "Nova tarefa" */
+    --app-accent-hover: #d48f2a;
+
+    /* Status das tarefas (usados no dashboard - dia 12/13) */
+    --status-a-fazer: #e6b422;
+    --status-a-fazer-bg: #fdf6dc;
+    --status-fazendo: #2f7dd1;
+    --status-fazendo-bg: #e3effb;
+    --status-concluida: #2e9d5b;
+    --status-concluida-bg: #e1f4e8;
+    --status-atrasada: #d64545;
+    --status-atrasada-bg: #fbe5e5;
+
+    /* Prioridade (Baixa / Média / Alta) */
+    --prioridade-baixa: #7a8b99;
+    --prioridade-media: #e9a23b;
+    --prioridade-alta: #d64545;
+
+    --app-radius: 10px;
+    --app-font: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+    /* Bootstrap herda estes valores */
+    --bs-body-font-family: var(--app-font);
+    --bs-body-bg: var(--app-bg);
+    --bs-body-color: #22313d;
+    --bs-border-radius: var(--app-radius);
+}
+
+body {
+    font-family: var(--app-font);
+    background: var(--app-bg);
+}
+
+/* ---------- Navbar ---------- */
+.app-navbar {
+    background: var(--app-ink);
+    padding-block: .75rem;
+}
+
+.app-brand {
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.app-brand:hover,
+.app-brand:focus { color: #fff; }
+
+.app-navbar .nav-link {
+    color: rgba(255, 255, 255, .72);
+    font-weight: 500;
+    border-radius: 6px;
+    padding: .45rem .8rem !important;
+    margin-right: .25rem;
+}
+
+.app-navbar .nav-link:hover {
+    color: #fff;
+    background: var(--app-ink-soft);
+}
+
+.app-navbar .nav-link.active {
+    color: #fff;
+    background: var(--app-ink-soft);
+    box-shadow: inset 0 -2px 0 var(--app-accent);
+}
+
+.app-navbar .navbar-toggler {
+    border-color: rgba(255, 255, 255, .3);
+}
+
+.app-navbar .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+.btn-new-task {
+    background: var(--app-accent);
+    color: var(--app-ink);
+    font-weight: 600;
+    border: none;
+}
+
+.btn-new-task:hover,
+.btn-new-task:focus-visible {
+    background: var(--app-accent-hover);
+    color: var(--app-ink);
+}
+
+@media (max-width: 767.98px) {
+    .btn-new-task { margin-top: .75rem; width: 100%; }
+}
+
+/* ---------- Cabeçalho de página ---------- */
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--app-ink);
+    margin: 0;
+}
+
+.page-actions { display: flex; gap: .5rem; }
+
+/* ---------- Superfícies reutilizáveis ---------- */
+.app-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    padding: 1.25rem;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--app-muted);
+    padding: 3rem 1rem;
+}
+
+.empty-state .bi {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: .5rem;
+}
+
+/* ---------- Mensagens flash ---------- */
+.flash-area .alert { border-radius: var(--app-radius); }
+
+/* ---------- Rodapé ---------- */
+.app-footer {
+    border-top: 1px solid var(--app-border);
+    color: var(--app-muted);
+    font-size: .85rem;
+    padding-block: 1rem;
+}
+
+/* ---------- Acessibilidade ---------- */
+a:focus-visible,
+.btn:focus-visible,
+.nav-link:focus-visible {
+    outline: 2px solid var(--app-accent);
+    outline-offset: 2px;
+}
