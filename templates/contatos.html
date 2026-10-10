@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Contatos</title>
+</head>
+<body>
+    <h1>Contatos</h1>
+    <p><a href="{{ url_for('novo_contato') }}">Novo contato</a></p>
+    <table border="1">
+        <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Ações</th>
+        </tr>
+        {% for c in contatos %}
+        <tr>
+            <td>{{ c.nome }}</td>
+            <td>{{ c.email }}</td>
+            <td>{{ c.telefone }}</td>
+            <td><a href="{{ url_for('editar_contato', id=c.id) }}">Editar</a></td>
+            <form method="POST" action="{{ url_for('deletar_contato', id=c.id) }}" style="display:inline" onsubmit="return confirm('Apagar este contato?')">
+    <button type="submit">Apagar</button>
+</form>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

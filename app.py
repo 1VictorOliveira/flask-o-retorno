@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from flask import Flask, redirect, render_template, request, url_for
-from flask_sqlalchemy import SQLAlchemy
+from models import db, Contato, Tarefa
 
 app = Flask(__name__)
 
@@ -11,22 +11,10 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 
-# ---------- Modelos ----------
 
-class Tarefa(db.Model):
-    """Tarefa com descrição, prazo, prioridade e status."""
-
-    id = db.Column(db.Integer, primary_key=True)
-    descricao = db.Column(db.String(200), nullable=False)
-    prazo = db.Column(db.Date, nullable=True)
-    prioridade = db.Column(db.String(10), nullable=False, default="media")
-    status = db.Column(db.String(20), nullable=False, default="pendente")
-
-    def __repr__(self):
-        return f"<Tarefa {self.id}: {self.descricao}>"
 
 
 # Cria as tabelas automaticamente na inicialização do app
@@ -90,7 +78,37 @@ def deletar_tarefa(id):
     db.session.delete(tarefa)
     db.session.commit()
     return redirect(url_for("tarefas"))
-
-
+@app.route("/contatos/novo", methods=["GET", "POST"])
+def novo_contato():
+    if request.method == "POST":
+        contato = Contato(
+            nome=request.form["nome"],
+            email=request.form["email"],
+            telefone=request.form["telefone"],
+        )
+        db.session.add(contato)
+        db.session.commit()
+        return redirect(url_for("contatos"))
+    return render_template("contato_form.html")
+@app.route("/contatos")
+def contatos():
+    lista = Contato.query.order_by(Contato.nome).all()
+    return render_template("contatos.html", contatos=lista)
+@app.route("/contatos/<int:id>/editar", methods=["GET", "POST"])
+def editar_contato(id):
+    contato = db.get_or_404(Contato, id)
+    if request.method == "POST":
+        contato.nome = request.form["nome"]
+        contato.email = request.form["email"]
+        contato.telefone = request.form["telefone"]
+        db.session.commit()
+        return redirect(url_for("contatos"))
+    return render_template("contato_form.html", contato=contato)
+@app.route("/contatos/<int:id>/deletar", methods=["POST"])
+def deletar_contato(id):
+    contato = db.get_or_404(Contato, id)
+    db.session.delete(contato)
+    db.session.commit()
+    return redirect(url_for("contatos"))
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
