@@ -57,7 +57,7 @@
                         <td>{{ tarefa.descricao }}</td>
                         <td>{{ tarefa.prazo | br_date }}</td>
                         <td class="prioridade-{{ tarefa.prioridade }}">{{ tarefa.prioridade | capitalize }}</td>
-                        <td>{{ tarefa.status }}</td>
+                        <td class="status-{{ tarefa.status }}">{{ tarefa.status | capitalize }}</td>
                         <td>
                             <form method="post" action="{{ url_for('deletar_tarefa', id=tarefa.id) }}">
                                 <button type="submit" class="btn-delete">Deletar</button>

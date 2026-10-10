@@ -39,6 +39,7 @@ def home():
 
 @app.route("/tarefas")
 def tarefas():
+    Tarefa.verificar_atrasadas()  # checagem automática de prazos
     lista = Tarefa.query.order_by(Tarefa.id.desc()).all()
     return render_template("tarefas.html", tarefas=lista)
 
@@ -65,7 +66,7 @@ def nova_tarefa():
         descricao=descricao,
         prazo=prazo,
         prioridade=prioridade,
-        status="pendente",
+        status=Tarefa.STATUS_PENDENTE,
     )
     db.session.add(nova)
     db.session.commit()

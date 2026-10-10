@@ -118,3 +118,17 @@ th {
 .vazio {
     color: #616e7c;
 }
+
+.status-pendente {
+    color: #2563eb;
+}
+
+.status-atrasada {
+    color: #b45309;
+    font-weight: 700;
+}
+
+.status-concluida {
+    color: #16a34a;
+    font-weight: 700;
+}
