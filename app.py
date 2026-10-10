@@ -78,7 +78,37 @@ def deletar_tarefa(id):
     db.session.delete(tarefa)
     db.session.commit()
     return redirect(url_for("tarefas"))
-
-
+@app.route("/contatos/novo", methods=["GET", "POST"])
+def novo_contato():
+    if request.method == "POST":
+        contato = Contato(
+            nome=request.form["nome"],
+            email=request.form["email"],
+            telefone=request.form["telefone"],
+        )
+        db.session.add(contato)
+        db.session.commit()
+        return redirect(url_for("contatos"))
+    return render_template("contato_form.html")
+@app.route("/contatos")
+def contatos():
+    lista = Contato.query.order_by(Contato.nome).all()
+    return render_template("contatos.html", contatos=lista)
+@app.route("/contatos/<int:id>/editar", methods=["GET", "POST"])
+def editar_contato(id):
+    contato = db.get_or_404(Contato, id)
+    if request.method == "POST":
+        contato.nome = request.form["nome"]
+        contato.email = request.form["email"]
+        contato.telefone = request.form["telefone"]
+        db.session.commit()
+        return redirect(url_for("contatos"))
+    return render_template("contato_form.html", contato=contato)
+@app.route("/contatos/<int:id>/deletar", methods=["POST"])
+def deletar_contato(id):
+    contato = db.get_or_404(Contato, id)
+    db.session.delete(contato)
+    db.session.commit()
+    return redirect(url_for("contatos"))
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

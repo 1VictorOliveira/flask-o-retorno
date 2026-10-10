@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Contato</title>
+</head>
+<body>
+    <h1>Contato</h1>
+    <form method="POST">
+        <p>Nome: <input type="text" name="nome" value="{{ contato.nome if contato else '' }}" required></p>
+        <p>E-mail: <input type="email" name="email" value="{{ contato.email if contato else '' }}" required></p>
+        <p>Telefone: <input type="text" name="telefone" value="{{ contato.telefone if contato and contato.telefone else '' }}"></p>
+        <button type="submit">Salvar</button>
+    </form>
+</body>
+</html>
