@@ -1,16 +1,43 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Contato</title>
-</head>
-<body>
-    <h1>Contato</h1>
-    <form method="POST">
-        <p>Nome: <input type="text" name="nome" value="{{ contato.nome if contato else '' }}" required></p>
-        <p>E-mail: <input type="email" name="email" value="{{ contato.email if contato else '' }}" required></p>
-        <p>Telefone: <input type="text" name="telefone" value="{{ contato.telefone if contato and contato.telefone else '' }}"></p>
-        <button type="submit">Salvar</button>
-    </form>
-</body>
-</html>
+{#
+    Formulário de contato: serve para CRIAR e para EDITAR.
+    A rota manda "contato" só na edição. Envia para a própria URL.
+    Campos: nome, email, telefone
+#}
+{% extends "base.html" %}
+
+{% set editando = contato is defined and contato %}
+{% set titulo = 'Editar contato' if editando else 'Novo contato' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+    <h1>{{ titulo }}</h1>
+
+    <section>
+        <form method="post">
+            <label>
+                Nome
+                <input type="text" name="nome" required maxlength="100"
+                       value="{{ contato.nome if editando else '' }}" autofocus>
+            </label>
+
+            <div class="campos">
+                <label>
+                    E-mail
+                    <input type="email" name="email" required maxlength="120"
+                           value="{{ contato.email if editando else '' }}">
+                </label>
+                <label>
+                    Telefone
+                    <input type="tel" name="telefone" maxlength="20"
+                           value="{{ contato.telefone if (editando and contato.telefone) else '' }}">
+                </label>
+            </div>
+
+            <div class="acoes">
+                <a href="{{ url_for('contatos') }}">Cancelar</a>
+                <button type="submit">{{ 'Salvar alterações' if editando else 'Salvar contato' }}</button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

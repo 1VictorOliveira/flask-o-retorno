@@ -1,0 +1,90 @@
+{#
+    Formulário de tarefa: serve para CRIAR e para EDITAR.
+    A rota precisa mandar:
+      contatos -> lista de Contato (campo "Responsável")
+      tarefa   -> a Tarefa sendo editada (não mandar ao criar)
+    O form não tem "action": envia para a própria URL.
+    Campos: descricao, prazo (aaaa-mm-dd), prioridade (baixa|media|alta),
+            status (pendente|fazendo|concluida), contato_id
+    Usa as classes do style.css do Victor (.container, section, label, .campos).
+#}
+{% extends "base.html" %}
+
+{% set editando = tarefa is defined and tarefa %}
+{% set titulo = 'Editar tarefa' if editando else 'Nova tarefa' %}
+
+{# Status que a pessoa pode escolher. "atrasada" é calculado pelo sistema. Valor / rótulo: #}
+{% set opcoes_status = [('pendente', 'A fazer'), ('fazendo', 'Fazendo'), ('concluida', 'Concluída')] %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+    {% set prazo_atual = tarefa.prazo.strftime('%Y-%m-%d') if (editando and tarefa.prazo) else '' %}
+    {% set prioridade_atual = tarefa.prioridade if editando else 'media' %}
+    {% set contato_atual = tarefa.contato_id if editando else (request.args.get('contato') or 0) | int %}
+    {% set status_atual = tarefa.status if (editando and tarefa.status in ['fazendo', 'concluida']) else 'pendente' %}
+
+    <h1>{{ titulo }}</h1>
+
+    {% if editando and tarefa.status == 'atrasada' %}
+        <p class="aviso">Esta tarefa está atrasada. Mude o prazo ou marque como concluída.</p>
+    {% endif %}
+
+    {% if not contatos %}
+        <section>
+            <p class="vazio">Toda tarefa precisa de um responsável. Cadastre um contato primeiro.</p>
+            <p><a href="{{ url_for('novo_contato') }}">Cadastrar contato</a></p>
+        </section>
+    {% else %}
+        <section>
+            <form method="post">
+                <label>
+                    Descrição
+                    <input type="text" name="descricao" required maxlength="200"
+                           value="{{ tarefa.descricao if editando else '' }}"
+                           placeholder="O que precisa ser feito?" autofocus>
+                </label>
+
+                <div class="campos">
+                    <label>
+                        Responsável
+                        <select name="contato_id" required>
+                            <option value="" disabled {{ 'selected' if not contato_atual }}>Escolha um contato</option>
+                            {% for c in contatos %}
+                                <option value="{{ c.id }}" {{ 'selected' if c.id == contato_atual }}>{{ c.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        Prazo
+                        <input type="date" name="prazo" value="{{ prazo_atual }}" required>
+                    </label>
+                </div>
+
+                <div class="campos">
+                    <label>
+                        Prioridade
+                        <select name="prioridade">
+                            {% for valor, rotulo in [('baixa', 'Baixa'), ('media', 'Média'), ('alta', 'Alta')] %}
+                                <option value="{{ valor }}" {{ 'selected' if prioridade_atual == valor }}>{{ rotulo }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        Status
+                        <select name="status">
+                            {% for valor, rotulo in opcoes_status %}
+                                <option value="{{ valor }}" {{ 'selected' if status_atual == valor }}>{{ rotulo }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+
+                <div class="acoes">
+                    <a href="{{ url_for('tarefas') }}">Cancelar</a>
+                    <button type="submit">{{ 'Salvar alterações' if editando else 'Criar tarefa' }}</button>
+                </div>
+            </form>
+        </section>
+    {% endif %}
+{% endblock %}

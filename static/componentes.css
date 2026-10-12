@@ -1,0 +1,121 @@
+/* Componentes que o style.css (base do Victor) não cobre: menu, avisos e mensagens flash.
+   Carregado depois do style.css em templates/base.html. */
+
+.menu {
+    background: #1f2933;
+    margin: -2rem -1rem 1.5rem;   /* encosta no topo, anulando o padding do body */
+    padding: 0.75rem 1rem;
+}
+
+.menu-conteudo {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+}
+
+.menu a {
+    color: #cbd2d9;
+    text-decoration: none;
+    padding: 0.3rem 0.1rem;
+    border-bottom: 2px solid transparent;
+}
+
+.menu a:hover,
+.menu a:focus-visible { color: #fff; }
+
+.menu a.ativo {
+    color: #fff;
+    border-bottom-color: #2563eb;
+}
+
+.menu .menu-marca {
+    color: #fff;
+    font-weight: 700;
+    margin-right: auto;
+}
+
+.aviso {
+    border-left: 4px solid #dc2626;
+    background: #fdecec;
+    padding: 0.6rem 0.9rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.flash {
+    border-left: 4px solid #2563eb;
+    background: #eaf1fe;
+    padding: 0.6rem 0.9rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.flash.success { border-color: #16a34a; background: #e8f6ed; }
+.flash.danger  { border-color: #dc2626; background: #fdecec; }
+
+.acoes {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* ---------- Cabeçalho de página, botões-link e linhas de tabela ---------- */
+.cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cabecalho h1 { margin: 0; }
+
+.botao {
+    display: inline-block;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    padding: 0.55rem 1.1rem;
+}
+
+.botao:hover { background: #1d4ed8; }
+
+.botao-claro {
+    background: #fff;
+    color: #1f2933;
+    border: 1px solid #ccd0d5;
+}
+
+.botao-claro:hover { background: #f4f6f8; }
+
+.botao-pequeno {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.85rem;
+}
+
+.linha-acoes {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.linha-acoes form { margin: 0; }
+
+.tabela-rolagem { overflow-x: auto; }
+
+td.sem-quebra { white-space: nowrap; }

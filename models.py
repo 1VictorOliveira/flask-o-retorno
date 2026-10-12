@@ -13,6 +13,7 @@ class Contato(db.Model):
 
 class Tarefa(db.Model):
     STATUS_PENDENTE = "pendente"
+    STATUS_FAZENDO = "fazendo"
     STATUS_CONCLUIDA = "concluida"
     STATUS_ATRASADA = "atrasada"
 
