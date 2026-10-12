@@ -43,8 +43,11 @@ def tarefas():
     return render_template("tarefas.html", tarefas=lista)
 
 
-@app.route("/tarefas/nova", methods=["POST"])
+@app.route("/tarefas/nova", methods=["GET", "POST"])
 def nova_tarefa():
+    if request.method == "GET":
+        return render_template("tarefa_form.html", contatos=Contato.query.order_by(Contato.nome).all())
+
     descricao = request.form.get("descricao", "").strip()
     if not descricao:
         return redirect(url_for("tarefas"))
@@ -61,15 +64,49 @@ def nova_tarefa():
     if prioridade not in {"baixa", "media", "alta"}:
         prioridade = "media"
 
+    status = request.form.get("status", "pendente")
+    if status not in {"pendente", "fazendo", "concluida"}:
+        status = "pendente"
+
     nova = Tarefa(
         descricao=descricao,
         prazo=prazo,
         prioridade=prioridade,
-        status="pendente",
+        status=status,
+        contato_id=request.form.get("contato_id", type=int),
     )
     db.session.add(nova)
     db.session.commit()
     return redirect(url_for("tarefas"))
+
+
+@app.route("/tarefas/<int:id>/editar", methods=["GET", "POST"])
+def editar_tarefa(id):
+    tarefa = db.get_or_404(Tarefa, id)
+    if request.method == "POST":
+        descricao = request.form.get("descricao", "").strip()
+        if descricao:
+            tarefa.descricao = descricao
+
+        prazo_raw = request.form.get("prazo", "").strip()
+        try:
+            tarefa.prazo = datetime.strptime(prazo_raw, "%Y-%m-%d").date() if prazo_raw else None
+        except ValueError:
+            pass  # mantém o prazo anterior se o formato for inválido
+
+        prioridade = request.form.get("prioridade", tarefa.prioridade)
+        if prioridade in {"baixa", "media", "alta"}:
+            tarefa.prioridade = prioridade
+
+        status = request.form.get("status", tarefa.status)
+        if status in {"pendente", "fazendo", "concluida"}:
+            tarefa.status = status
+
+        tarefa.contato_id = request.form.get("contato_id", type=int)
+        db.session.commit()
+        return redirect(url_for("tarefas"))
+    return render_template("tarefa_form.html", tarefa=tarefa,
+                           contatos=Contato.query.order_by(Contato.nome).all())
 
 
 @app.route("/tarefas/<int:id>/deletar", methods=["POST"])

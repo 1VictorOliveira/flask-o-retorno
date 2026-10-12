@@ -1,139 +1,90 @@
 {#
     Formulário de tarefa: serve para CRIAR e para EDITAR.
-
-    Variáveis que a rota precisa mandar:
-      contatos -> lista de Contato (para o campo "Responsável")
-      tarefa   -> a Tarefa sendo editada (omitir ou None ao criar)
-
-    O form não tem "action": ele envia para a própria URL (como o contato_form.html).
-    Campos enviados (request.form):
-      descricao, prazo (aaaa-mm-dd), prioridade (baixa|media|alta),
-      status (a_fazer|fazendo|concluida), contato_id
+    A rota precisa mandar:
+      contatos -> lista de Contato (campo "Responsável")
+      tarefa   -> a Tarefa sendo editada (não mandar ao criar)
+    O form não tem "action": envia para a própria URL.
+    Campos: descricao, prazo (aaaa-mm-dd), prioridade (baixa|media|alta),
+            status (pendente|fazendo|concluida), contato_id
+    Usa as classes do style.css do Victor (.container, section, label, .campos).
 #}
 {% extends "base.html" %}
 
-{% block title %}{{ 'Editar tarefa' if (tarefa is defined and tarefa) else 'Nova tarefa' }}{% endblock %}
-{% block page_title %}{{ 'Editar tarefa' if (tarefa is defined and tarefa) else 'Nova tarefa' }}{% endblock %}
+{% set editando = tarefa is defined and tarefa %}
+{% set titulo = 'Editar tarefa' if editando else 'Nova tarefa' %}
+
+{# Status que a pessoa pode escolher. "atrasada" é calculado pelo sistema. Valor / rótulo: #}
+{% set opcoes_status = [('pendente', 'A fazer'), ('fazendo', 'Fazendo'), ('concluida', 'Concluída')] %}
+
+{% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
-    {% set editando = tarefa is defined and tarefa %}
-
-    {# Valores iniciais #}
-    {% set descricao_atual = tarefa.descricao if editando else '' %}
     {% set prazo_atual = tarefa.prazo.strftime('%Y-%m-%d') if (editando and tarefa.prazo) else '' %}
     {% set prioridade_atual = tarefa.prioridade if editando else 'media' %}
     {% set contato_atual = tarefa.contato_id if editando else (request.args.get('contato') or 0) | int %}
-    {# "pendente" (valor antigo) e "atrasada" (calculado pelo sistema) aparecem como "A fazer" no select #}
-    {% set status_atual = tarefa.status if (editando and tarefa.status in ['fazendo', 'concluida']) else 'a_fazer' %}
+    {% set status_atual = tarefa.status if (editando and tarefa.status in ['fazendo', 'concluida']) else 'pendente' %}
 
-    <div class="form-wrap">
+    <h1>{{ titulo }}</h1>
 
-        {% if editando and tarefa.status == 'atrasada' %}
-            <div class="alert alert-danger" role="alert">
-                Esta tarefa está atrasada. Mude o prazo ou marque como concluída.
-            </div>
-        {% endif %}
+    {% if editando and tarefa.status == 'atrasada' %}
+        <p class="aviso">Esta tarefa está atrasada. Mude o prazo ou marque como concluída.</p>
+    {% endif %}
 
-        {% if not contatos %}
-            <div class="app-card empty-state">
-                <i class="bi bi-person-plus"></i>
-                <p class="mb-3">Toda tarefa precisa de um responsável. Cadastre um contato primeiro.</p>
-                <a href="/contatos/novo" class="btn btn-new-task">Cadastrar contato</a>
-            </div>
-        {% else %}
+    {% if not contatos %}
+        <section>
+            <p class="vazio">Toda tarefa precisa de um responsável. Cadastre um contato primeiro.</p>
+            <p><a href="{{ url_for('novo_contato') }}">Cadastrar contato</a></p>
+        </section>
+    {% else %}
+        <section>
+            <form method="post">
+                <label>
+                    Descrição
+                    <input type="text" name="descricao" required maxlength="200"
+                           value="{{ tarefa.descricao if editando else '' }}"
+                           placeholder="O que precisa ser feito?" autofocus>
+                </label>
 
-        <form method="post" class="app-card needs-validation" novalidate>
-
-            <div class="mb-4">
-                <label for="descricao" class="form-label">Descrição</label>
-                <input type="text" class="form-control" id="descricao" name="descricao"
-                       value="{{ descricao_atual }}" maxlength="200" required
-                       placeholder="O que precisa ser feito?" autofocus>
-                <div class="form-text d-flex justify-content-between">
-                    <span>Descreva a tarefa em uma frase.</span>
-                    <span id="descricao-contador" aria-live="polite">0/200</span>
-                </div>
-                <div class="invalid-feedback">Escreva a descrição da tarefa.</div>
-            </div>
-
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label for="contato_id" class="form-label">Responsável</label>
-                    <select class="form-select" id="contato_id" name="contato_id" required>
-                        <option value="" disabled {{ 'selected' if not contato_atual }}>Escolha um contato</option>
-                        {% for c in contatos %}
-                            <option value="{{ c.id }}" {{ 'selected' if c.id == contato_atual }}>
-                                {{ c.nome }}{% if c.email %} ({{ c.email }}){% endif %}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <div class="invalid-feedback">Escolha quem vai fazer a tarefa.</div>
+                <div class="campos">
+                    <label>
+                        Responsável
+                        <select name="contato_id" required>
+                            <option value="" disabled {{ 'selected' if not contato_atual }}>Escolha um contato</option>
+                            {% for c in contatos %}
+                                <option value="{{ c.id }}" {{ 'selected' if c.id == contato_atual }}>{{ c.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        Prazo
+                        <input type="date" name="prazo" value="{{ prazo_atual }}" required>
+                    </label>
                 </div>
 
-                <div class="col-md-6">
-                    <label for="prazo" class="form-label">Prazo</label>
-                    <input type="date" class="form-control" id="prazo" name="prazo"
-                           value="{{ prazo_atual }}" required>
-                    <div class="invalid-feedback">Informe o prazo de entrega.</div>
+                <div class="campos">
+                    <label>
+                        Prioridade
+                        <select name="prioridade">
+                            {% for valor, rotulo in [('baixa', 'Baixa'), ('media', 'Média'), ('alta', 'Alta')] %}
+                                <option value="{{ valor }}" {{ 'selected' if prioridade_atual == valor }}>{{ rotulo }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        Status
+                        <select name="status">
+                            {% for valor, rotulo in opcoes_status %}
+                                <option value="{{ valor }}" {{ 'selected' if status_atual == valor }}>{{ rotulo }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
                 </div>
-            </div>
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <span class="form-label d-block" id="rotulo-prioridade">Prioridade</span>
-                    <div class="prio-group" role="radiogroup" aria-labelledby="rotulo-prioridade">
-                        {% for valor, rotulo in [('baixa', 'Baixa'), ('media', 'Média'), ('alta', 'Alta')] %}
-                            <input type="radio" class="btn-check" name="prioridade" id="prio-{{ valor }}"
-                                   value="{{ valor }}" {{ 'checked' if prioridade_atual == valor }}>
-                            <label class="btn prio-{{ valor }}" for="prio-{{ valor }}">{{ rotulo }}</label>
-                        {% endfor %}
-                    </div>
+                <div class="acoes">
+                    <a href="{{ url_for('tarefas') }}">Cancelar</a>
+                    <button type="submit">{{ 'Salvar alterações' if editando else 'Criar tarefa' }}</button>
                 </div>
-
-                <div class="col-md-6">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-select" id="status" name="status">
-                        {% for valor, rotulo in [('a_fazer', 'A fazer'), ('fazendo', 'Fazendo'), ('concluida', 'Concluída')] %}
-                            <option value="{{ valor }}" {{ 'selected' if status_atual == valor }}>{{ rotulo }}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="form-text">"Atrasada" é aplicado automaticamente quando o prazo passa.</div>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <a href="/tarefas" class="btn btn-outline-secondary">Cancelar</a>
-                <button type="submit" class="btn btn-new-task">
-                    {{ 'Salvar alterações' if editando else 'Criar tarefa' }}
-                </button>
-            </div>
-        </form>
-
-        {% endif %}
-    </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Validação do Bootstrap: mostra as mensagens só depois da primeira tentativa de envio
-    document.querySelectorAll('.needs-validation').forEach(function (form) {
-        form.addEventListener('submit', function (evento) {
-            if (!form.checkValidity()) {
-                evento.preventDefault();
-                evento.stopPropagation();
-            }
-            form.classList.add('was-validated');
-        });
-    });
-
-    // Contador de caracteres da descrição (limite de 200 no banco)
-    (function () {
-        var campo = document.getElementById('descricao');
-        var contador = document.getElementById('descricao-contador');
-        if (!campo || !contador) return;
-        function atualizar() { contador.textContent = campo.value.length + '/' + campo.maxLength; }
-        campo.addEventListener('input', atualizar);
-        atualizar();
-    })();
-</script>
+            </form>
+        </section>
+    {% endif %}
 {% endblock %}
