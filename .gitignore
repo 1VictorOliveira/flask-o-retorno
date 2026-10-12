@@ -1,0 +1,28 @@
+# Ambiente virtual
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Banco de dados SQLite
+*.db
+*.db-journal
+instance/
+
+# Variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Flask
+.flaskenv
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store

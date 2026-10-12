@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <h1>Minhas Tarefas</h1>
+
+        <section class="novo">
+            <h2>Nova tarefa</h2>
+            <form method="post" action="{{ url_for('nova_tarefa') }}">
+                <label>
+                    Descrição
+                    <input type="text" name="descricao" required maxlength="200"
+                           placeholder="O que precisa ser feito?">
+                </label>
+                <div class="campos">
+                    <label>
+                        Prazo
+                        <input type="date" name="prazo">
+                    </label>
+                    <label>
+                        Prioridade
+                        <select name="prioridade">
+                            <option value="baixa">Baixa</option>
+                            <option value="media" selected>Média</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </label>
+                </div>
+                <button type="submit">Adicionar</button>
+            </form>
+        </section>
+
+        <section class="lista">
+            <h2>Lista de tarefas</h2>
+            {% if tarefas %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Descrição</th>
+                        <th>Prazo</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tarefa in tarefas %}
+                    <tr>
+                        <td>{{ tarefa.id }}</td>
+                        <td>{{ tarefa.descricao }}</td>
+                        <td>{{ tarefa.prazo | br_date }}</td>
+                        <td class="prioridade-{{ tarefa.prioridade }}">{{ tarefa.prioridade | capitalize }}</td>
+                        <td>{{ tarefa.status }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('deletar_tarefa', id=tarefa.id) }}">
+                                <button type="submit" class="btn-delete">Deletar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="vazio">Nenhuma tarefa cadastrada ainda.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
