@@ -1,8 +1,9 @@
 """Gerenciador de Tarefas — estrutura inicial com Flask e Flask-SQLAlchemy."""
 
+import os
 from datetime import datetime
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
 from models import db, Contato, Tarefa
 
 app = Flask(__name__)
@@ -10,6 +11,8 @@ app = Flask(__name__)
 # Banco de dados SQLite local (criado em instance/app.db)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# Necessária para sessões (mensagens flash). Em produção, defina via ambiente.
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
 db.init_app(app)
 
@@ -27,6 +30,13 @@ def br_date(value):
     return value.strftime("%d/%m/%Y") if value else "—"
 
 
+# ---------- Funções auxiliares ----------
+
+def contato_existe(contato_id):
+    """True se contato_id for nulo ou pertencer a um Contato cadastrado."""
+    return contato_id is None or db.session.get(Contato, contato_id) is not None
+
+
 # ---------- Rotas ----------
 
 @app.route("/")
@@ -37,8 +47,22 @@ def home():
 @app.route("/tarefas")
 def tarefas():
     Tarefa.verificar_atrasadas()  # checagem automática de prazos
-    lista = Tarefa.query.order_by(Tarefa.id.desc()).all()
-    return render_template("tarefas.html", tarefas=lista)
+
+    # Filtro opcional por responsável (?contato=<id>)
+    contato_filtro = None
+    query = Tarefa.query
+    contato_id = request.args.get("contato", type=int)
+    if contato_id is not None:
+        contato_filtro = db.get_or_404(Contato, contato_id)
+        query = query.filter(Tarefa.contato_id == contato_filtro.id)
+
+    lista = query.order_by(Tarefa.id.desc()).all()
+    return render_template(
+        "tarefas.html",
+        tarefas=lista,
+        contatos=Contato.query.order_by(Contato.nome).all(),
+        contato_filtro=contato_filtro,
+    )
 
 
 @app.route("/tarefas/nova", methods=["GET", "POST"])
@@ -67,12 +91,17 @@ def nova_tarefa():
     if status not in {Tarefa.STATUS_PENDENTE, Tarefa.STATUS_FAZENDO, Tarefa.STATUS_CONCLUIDA}:
         status = Tarefa.STATUS_PENDENTE
 
+    contato_id = request.form.get("contato_id", type=int)
+    if not contato_existe(contato_id):
+        flash("Contato inválido. Escolha um responsável cadastrado.", "danger")
+        return redirect(url_for("nova_tarefa"))
+
     nova = Tarefa(
         descricao=descricao,
         prazo=prazo,
         prioridade=prioridade,
         status=status,
-        contato_id=request.form.get("contato_id", type=int),
+        contato_id=contato_id,
     )
     db.session.add(nova)
     db.session.commit()
@@ -102,7 +131,12 @@ def editar_tarefa(id):
             status = tarefa.status
         tarefa.status = status
 
-        tarefa.contato_id = request.form.get("contato_id", type=int)
+        contato_id = request.form.get("contato_id", type=int)
+        if not contato_existe(contato_id):
+            flash("Contato inválido. Escolha um responsável cadastrado.", "danger")
+            return redirect(url_for("editar_tarefa", id=id))
+        tarefa.contato_id = contato_id
+
         db.session.commit()
         return redirect(url_for("tarefas"))
     return render_template("tarefa_form.html", tarefa=tarefa,

@@ -4,12 +4,36 @@
 
 {% block content %}
     {% set rotulo_prioridade = {'baixa': 'Baixa', 'media': 'Média', 'alta': 'Alta'} %}
-    {% set rotulo_status = {'pendente': 'A fazer', 'fazendo': 'Fazendo', 'concluida': 'Concluída', 'atrasada': 'Atrasada'} %}
+    {% set rotulo_status = {
+        'pendente': '🟡 A fazer',
+        'fazendo': '🔵 Fazendo',
+        'concluida': '🟢 Concluída',
+        'atrasada': '🔴 Atrasada'
+    } %}
 
     <div class="cabecalho">
         <h1>Tarefas</h1>
-        <a href="{{ url_for('nova_tarefa') }}" class="botao">Nova tarefa</a>
+        <a href="{{ url_for('nova_tarefa', contato=contato_filtro.id if contato_filtro else none) }}" class="botao">Nova tarefa</a>
     </div>
+
+    <form method="get" action="{{ url_for('tarefas') }}" class="filtro">
+        <label>
+            Responsável
+            <select name="contato" onchange="this.form.submit()">
+                <option value="">Todos</option>
+                {% for c in contatos %}
+                <option value="{{ c.id }}" {{ 'selected' if contato_filtro and c.id == contato_filtro.id }}>{{ c.nome }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        {% if contato_filtro %}
+        <a href="{{ url_for('tarefas') }}" class="botao botao-claro botao-pequeno">Limpar filtro</a>
+        {% endif %}
+    </form>
+
+    {% if contato_filtro %}
+    <p class="flash">Mostrando apenas as tarefas de <strong>{{ contato_filtro.nome }}</strong>.</p>
+    {% endif %}
 
     <section>
         {% if tarefas %}
@@ -32,7 +56,7 @@
                             <td>{{ tarefa.contato.nome if tarefa.contato else '—' }}</td>
                             <td class="sem-quebra">{{ tarefa.prazo | br_date }}</td>
                             <td class="prioridade-{{ tarefa.prioridade }}">{{ rotulo_prioridade.get(tarefa.prioridade, tarefa.prioridade) }}</td>
-                            <td>{{ rotulo_status.get(tarefa.status, tarefa.status) }}</td>
+                            <td><span class="badge badge-{{ tarefa.status }}">{{ rotulo_status.get(tarefa.status, tarefa.status) }}</span></td>
                             <td class="sem-quebra">
                                 <div class="linha-acoes">
                                     <a href="{{ url_for('editar_tarefa', id=tarefa.id) }}" class="botao botao-claro botao-pequeno">Editar</a>

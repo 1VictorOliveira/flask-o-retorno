@@ -1,8 +1,20 @@
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 db = SQLAlchemy()
+
+
+# O SQLite não aplica chaves estrangeiras por padrão.
+# Este listener ativa a integridade referencial
+# em todas as conexões do banco.
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
 
 class Contato(db.Model):
     id = db.Column(db.Integer, primary_key=True)
