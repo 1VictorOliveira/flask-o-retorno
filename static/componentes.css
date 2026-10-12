@@ -70,3 +70,52 @@ select:focus-visible {
     outline: 2px solid #2563eb;
     outline-offset: 2px;
 }
+
+/* ---------- Cabeçalho de página, botões-link e linhas de tabela ---------- */
+.cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cabecalho h1 { margin: 0; }
+
+.botao {
+    display: inline-block;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    padding: 0.55rem 1.1rem;
+}
+
+.botao:hover { background: #1d4ed8; }
+
+.botao-claro {
+    background: #fff;
+    color: #1f2933;
+    border: 1px solid #ccd0d5;
+}
+
+.botao-claro:hover { background: #f4f6f8; }
+
+.botao-pequeno {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.85rem;
+}
+
+.linha-acoes {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.linha-acoes form { margin: 0; }
+
+.tabela-rolagem { overflow-x: auto; }
+
+td.sem-quebra { white-space: nowrap; }

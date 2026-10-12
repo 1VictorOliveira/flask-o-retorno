@@ -1,30 +1,48 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Contatos</title>
-</head>
-<body>
-    <h1>Contatos</h1>
-    <p><a href="{{ url_for('novo_contato') }}">Novo contato</a></p>
-    <table border="1">
-        <tr>
-            <th>Nome</th>
-            <th>E-mail</th>
-            <th>Telefone</th>
-            <th>Ações</th>
-        </tr>
-        {% for c in contatos %}
-        <tr>
-            <td>{{ c.nome }}</td>
-            <td>{{ c.email }}</td>
-            <td>{{ c.telefone }}</td>
-            <td><a href="{{ url_for('editar_contato', id=c.id) }}">Editar</a></td>
-            <form method="POST" action="{{ url_for('deletar_contato', id=c.id) }}" style="display:inline" onsubmit="return confirm('Apagar este contato?')">
-    <button type="submit">Apagar</button>
-</form>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Contatos{% endblock %}
+
+{% block content %}
+    <div class="cabecalho">
+        <h1>Contatos</h1>
+        <a href="{{ url_for('novo_contato') }}" class="botao">Novo contato</a>
+    </div>
+
+    <section>
+        {% if contatos %}
+            <div class="tabela-rolagem">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Telefone</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in contatos %}
+                        <tr>
+                            <td>{{ c.nome }}</td>
+                            <td>{{ c.email }}</td>
+                            <td class="sem-quebra">{{ c.telefone or '—' }}</td>
+                            <td class="sem-quebra">
+                                <div class="linha-acoes">
+                                    <a href="{{ url_for('nova_tarefa', contato=c.id) }}" class="botao botao-claro botao-pequeno">Nova tarefa</a>
+                                    <a href="{{ url_for('editar_contato', id=c.id) }}" class="botao botao-claro botao-pequeno">Editar</a>
+                                    <form method="post" action="{{ url_for('deletar_contato', id=c.id) }}"
+                                          onsubmit="return confirm('Apagar este contato? As tarefas dele também serão apagadas.');">
+                                        <button type="submit" class="btn-delete">Apagar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="vazio">Nenhum contato cadastrado ainda. Clique em "Novo contato" para cadastrar o primeiro.</p>
+        {% endif %}
+    </section>
+{% endblock %}
