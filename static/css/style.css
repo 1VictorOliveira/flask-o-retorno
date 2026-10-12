@@ -164,3 +164,80 @@ a:focus-visible,
     outline: 2px solid var(--app-accent);
     outline-offset: 2px;
 }
+
+/* =========================================================
+   Formulários (tarefa_form.html)
+   ========================================================= */
+.form-wrap {
+    max-width: 720px;
+    margin-inline: auto;
+}
+
+.form-wrap .app-card { padding: 1.5rem; }
+
+.form-label {
+    font-weight: 600;
+    color: var(--app-ink);
+    margin-bottom: .35rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--app-ink-soft);
+    box-shadow: 0 0 0 .2rem rgba(44, 74, 95, .18);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--app-border);
+}
+
+@media (max-width: 575.98px) {
+    .form-actions { flex-direction: column-reverse; }
+    .form-actions .btn { width: 100%; }
+}
+
+/* Prioridade: três opções lado a lado, cada uma com a cor da prioridade */
+.prio-group {
+    display: flex;
+    gap: .5rem;
+}
+
+.prio-group .btn {
+    flex: 1;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    color: var(--app-ink);
+    font-weight: 500;
+}
+
+.prio-group .btn:hover { border-color: var(--app-ink-soft); }
+
+.prio-group .btn-check:checked + .prio-baixa {
+    background: var(--prioridade-baixa);
+    border-color: var(--prioridade-baixa);
+    color: var(--app-ink);
+    font-weight: 600;
+}
+
+.prio-group .btn-check:checked + .prio-media {
+    background: var(--prioridade-media);
+    border-color: var(--prioridade-media);
+    color: var(--app-ink);
+    font-weight: 600;
+}
+
+.prio-group .btn-check:checked + .prio-alta {
+    background: var(--prioridade-alta);
+    border-color: var(--prioridade-alta);
+    color: #fff;
+    font-weight: 600;
+}
+
+.prio-group .btn-check:focus-visible + .btn {
+    outline: 2px solid var(--app-ink);
+    outline-offset: 2px;
+}
