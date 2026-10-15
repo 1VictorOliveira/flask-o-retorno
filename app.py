@@ -159,7 +159,16 @@ def deletar_tarefa(id):
 def relatorios():
     """Página com opções de exportação de relatórios."""
     contatos = Contato.query.order_by(Contato.nome).all()
-    return render_template("relatorios.html", contatos=contatos)
+    return render_template(
+        "relatorios.html",
+        contatos=contatos,
+        form_tipo="tarefas",
+        form_status="todos",
+        form_prioridade="todas",
+        form_contato_id=None,
+        form_data_inicio="",
+        form_data_fim="",
+    )
 
 
 def _parse_date(valor):
