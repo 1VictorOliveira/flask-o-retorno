@@ -12,8 +12,10 @@
             <h1>Tarefas</h1>
             <p class="subtitulo">Organize o trabalho da equipe, uma tarefa por vez.</p>
         </div>
-        <a href="{{ novo_link }}" class="botao">{{ icone('mais') }} Nova tarefa</a>
-        <a href="{{ url_for('relatorios') }}" class="botao botao-claro">{{ icone('seta') }} Exportar relatório</a>
+        <div class="acoes-cabecalho">
+            <a href="{{ novo_link }}" class="botao">{{ icone('mais') }} Nova tarefa</a>
+            <a href="{{ url_for('relatorios') }}" class="botao botao-claro">{{ icone('seta') }} Exportar relatório</a>
+        </div>
     </div>
 {% endblock %}
 
