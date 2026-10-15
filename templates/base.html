@@ -1,27 +1,163 @@
+{% from "_pixel.html" import icone %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Tarefas{% endblock %} | Gestão de Tarefas</title>
+    <title>{% block title %}Tarefas{% endblock %} | Harpia</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-3 -1 16 17' shape-rendering='crispEdges'%3E%3Crect x='-3' y='-1' width='16' height='17' fill='%232b323a'/%3E%3Cpath fill='%231f5a3a' d='M1 0h1v1h-1zM4 0h1v1h-1zM7 0h1v1h-1zM0 1h2v1h-2zM3 1h3v1h-3zM7 1h2v1h-2zM0 2h9v1h-9zM0 3h9v1h-9z'/%3E%3Cpath fill='%238e979f' d='M1 4h8v1h-8zM0 5h9v1h-9zM0 6h2v1h-2zM4 6h2v1h-2zM7 6h2v1h-2zM0 7h6v1h-6zM1 8h7v1h-7zM2 9h5v1h-5zM3 10h2v1h-2z'/%3E%3Cpath fill='%232b323a' d='M2 6h2v1h-2z'/%3E%3Cpath fill='%23f2c94c' d='M6 6h1v1h-1zM6 7h3v1h-3z'/%3E%3Cpath fill='%23d9a62b' d='M9 9h1v1h-1zM1 10h1v1h-1zM8 10h2v1h-2zM1 11h2v1h-2zM7 11h2v1h-2zM2 12h2v1h-2zM6 12h2v1h-2zM3 13h4v1h-4zM4 14h2v1h-2z'/%3E%3C/svg%3E">
+
+    <!-- Fontes: Pixelify Sans (títulos, menu, botões) e Manrope (texto) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='componentes.css') }}">
 </head>
 <body>
-    <nav class="menu">
-        <div class="menu-conteudo">
-            <span class="menu-marca">Gestão de Tarefas</span>
-            <a href="{{ url_for('tarefas') }}" {% if request.endpoint in ['tarefas', 'nova_tarefa', 'editar_tarefa'] %}class="ativo" aria-current="page"{% endif %}>Tarefas</a>
-            <a href="{{ url_for('contatos') }}" {% if request.endpoint in ['contatos', 'novo_contato', 'editar_contato'] %}class="ativo" aria-current="page"{% endif %}>Contatos</a>
-        </div>
-    </nav>
-
-    <main class="container">
-        {% for categoria, texto in get_flashed_messages(with_categories=true) %}
-            <p class="flash {{ categoria }}" role="status">{{ texto }}</p>
+    {# Cenário de selva em pixel art: fica fixo atrás do conteúdo #}
+    <div class="selva" aria-hidden="true">
+        {% for lado in ['esquerda', 'direita'] %}
+        <svg class="selva-arvore {{ lado }}" viewBox="0 0 220 900" preserveAspectRatio="xMinYMax meet" shape-rendering="crispEdges">
+            <rect x="0" y="40" width="56" height="24" fill="#264536"/>
+            <rect x="0" y="64" width="104" height="32" fill="#264536"/>
+            <rect x="0" y="96" width="152" height="804" fill="#264536"/>
+            <rect x="16" y="96" width="24" height="804" fill="#2a4b3c"/>
+            <rect x="64" y="0" width="8" height="480" fill="#2f6b4c"/>
+            <rect x="72" y="176" width="32" height="8" fill="#2f6b4c"/>
+            <rect x="32" y="288" width="32" height="8" fill="#2f6b4c"/>
+            <rect x="128" y="136" width="8" height="340" fill="#2c5d46"/>
+            <rect x="136" y="300" width="24" height="8" fill="#2c5d46"/>
+            <rect x="0" y="656" width="72" height="64" fill="#2a5442"/>
+            <rect x="152" y="680" width="56" height="40" fill="#2a5442"/>
+            <rect x="0" y="720" width="208" height="180" fill="#2a5442"/>
+        </svg>
         {% endfor %}
+    </div>
 
-        {% block content %}{% endblock %}
-    </main>
+    <div class="pagina">
+        <div class="topo">
+        <header class="menu">
+            <div class="menu-conteudo">
+                <a href="{{ url_for('tarefas') }}" class="menu-marca">
+                    {{ icone('harpia', 'marca-icone') }}
+                    HARPIA
+                </a>
+                <nav aria-label="Principal">
+                    <a href="{{ url_for('tarefas') }}" {% if request.endpoint in ['tarefas', 'nova_tarefa', 'editar_tarefa'] %}class="ativo" aria-current="page"{% endif %}>Tarefas</a>
+                    <a href="{{ url_for('contatos') }}" {% if request.endpoint in ['contatos', 'novo_contato', 'editar_contato'] %}class="ativo" aria-current="page"{% endif %}>Contatos</a>
+                </nav>
+            </div>
+        </header>
+
+        {# Título e subtítulo de cada página (bloco "cabecalho" dos templates) #}
+        {% block cabecalho %}{% endblock %}
+        </div>
+
+        <main class="container">
+            {% for categoria, texto in get_flashed_messages(with_categories=true) %}
+                <p class="flash {{ categoria }}" role="status">
+                    {{ icone('caveira' if categoria == 'danger' else 'check') }}
+                    {{ texto }}
+                </p>
+            {% endfor %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="rodape">
+            <span class="rodape-ponto" aria-hidden="true"></span>
+            HARPIA · Cada tarefa, uma pessoa responsável.
+        </footer>
+    </div>
+
+    {# Diálogo de confirmação usado pelos formulários com data-confirm #}
+    <dialog id="confirmar" class="dialogo" aria-labelledby="confirmar-titulo">
+        {{ icone('harpia') }}
+        <h2 id="confirmar-titulo">Apagar?</h2>
+        <p id="confirmar-detalhe"></p>
+        <div class="acoes">
+            <button type="button" class="botao-claro" id="confirmar-cancelar" autofocus>Cancelar</button>
+            <button type="button" class="botao-perigo" id="confirmar-ok">{{ icone('lixeira') }} Apagar</button>
+        </div>
+    </dialog>
+
+    <script>
+    (function () {
+        var semAnimacao = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* Partículas quadradas que saltam em passos (apagar = cinza, concluir = dourado) */
+        function particulas(caixa, cor, quantidade) {
+            if (semAnimacao) return;
+            for (var i = 0; i < quantidade; i++) {
+                var p = document.createElement('span');
+                p.className = 'particula';
+                p.style.background = cor;
+                p.style.left = (caixa.left + Math.random() * caixa.width) + 'px';
+                p.style.top = (caixa.top + Math.random() * caixa.height) + 'px';
+                p.style.setProperty('--dx', (Math.round((Math.random() - 0.5) * 6) * 8) + 'px');
+                p.style.setProperty('--dy', (-8 - Math.round(Math.random() * 4) * 8) + 'px');
+                document.body.appendChild(p);
+                setTimeout(p.remove.bind(p), 700);
+            }
+        }
+
+        /* Envia o formulário; se ele estiver numa linha de tabela, a linha se desfaz antes */
+        function enviar(form) {
+            var linha = form.closest('tr');
+            if (!linha || semAnimacao) { form.submit(); return; }
+            particulas(linha.getBoundingClientRect(), '#8e979f', 18);
+            linha.classList.add('desfazendo');
+            setTimeout(function () { form.submit(); }, 400);
+        }
+
+        /* Formulários com data-confirm abrem o diálogo antes de enviar */
+        var dialogo = document.getElementById('confirmar');
+        var pendente = null;
+
+        document.addEventListener('submit', function (evento) {
+            var form = evento.target;
+            if (!form.dataset.confirm) return;
+            evento.preventDefault();
+
+            if (!dialogo.showModal) {           /* navegador sem <dialog> */
+                if (window.confirm(form.dataset.confirm)) enviar(form);
+                return;
+            }
+            pendente = form;
+            document.getElementById('confirmar-titulo').textContent = form.dataset.confirm;
+            document.getElementById('confirmar-detalhe').textContent = form.dataset.confirmDetalhe || '';
+            dialogo.showModal();
+        });
+
+        document.getElementById('confirmar-cancelar').addEventListener('click', function () {
+            pendente = null;
+            dialogo.close();
+        });
+
+        document.getElementById('confirmar-ok').addEventListener('click', function () {
+            dialogo.close();
+            if (pendente) enviar(pendente);
+            pendente = null;
+        });
+
+        /* Ao escolher "Concluída" no formulário, solta partículas douradas */
+        var status = document.querySelector('select[name="status"]');
+        if (status) {
+            status.addEventListener('change', function () {
+                if (status.value === 'concluida') particulas(status.getBoundingClientRect(), '#f2c94c', 14);
+            });
+        }
+
+        /* Toast de sucesso some sozinho depois de 3s */
+        document.querySelectorAll('.flash.success').forEach(function (toast) {
+            setTimeout(function () {
+                toast.classList.add('sumindo');
+                setTimeout(function () { toast.remove(); }, 300);
+            }, 3000);
+        });
+    })();
+    </script>
 </body>
 </html>

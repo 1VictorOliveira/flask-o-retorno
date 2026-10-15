@@ -1,159 +1,765 @@
-/* Componentes que o style.css (base do Victor) não cobre: menu, avisos e mensagens flash.
-   Carregado depois do style.css em templates/base.html. */
+/* HARPIA — interface "meio pixelada" (design feito no Figma).
+   Moldura em pixel art (painéis, bordas, botões, ícones); conteúdo em fonte legível.
+   Carregado DEPOIS do style.css (base do Victor) em templates/base.html:
+   as regras daqui sobrescrevem as de lá sem editar o arquivo dele.
+   Ícones em pixel: templates/_pixel.html. */
+
+:root {
+    /* paleta do guia de identidade */
+    --ardosia-escura: #2b323a;
+    --ardosia:        #4a545e;
+    --pluma:          #8e979f;
+    --selva:          #1f5a3a;
+    --folha:          #3f8f5a;
+    --ouro:           #d9a62b;
+    --amarelo:        #f2c94c;
+    --pergaminho:     #efe6cf;
+    --vermelho:       #c0392b;
+    --ceu:            #4f86c6;
+
+    /* derivadas */
+    --painel:      #272d34;
+    --campo:       #21262c;
+    --linha:       #3b444d;
+    --sombra:      #181c20;
+    --texto:       #e9e4d6;
+    --texto-suave: #b7b2a6;
+
+    --px:  'Pixelify Sans', 'Courier New', monospace;
+    --txt: 'Manrope', system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    /* cantos em degrau de 2px (no lugar de border-radius) */
+    --cortes: polygon(0 2px, 2px 2px, 2px 0, calc(100% - 2px) 0, calc(100% - 2px) 2px, 100% 2px,
+                      100% calc(100% - 2px), calc(100% - 2px) calc(100% - 2px), calc(100% - 2px) 100%,
+                      2px 100%, 2px calc(100% - 2px), 0 calc(100% - 2px));
+
+    color-scheme: dark;
+    accent-color: var(--ouro);
+}
+
+/* =====================================================================
+   1. Página e cenário
+   ===================================================================== */
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: var(--txt);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--texto);
+    /* céu em faixas, sem degradê suave */
+    background: linear-gradient(to bottom,
+        #36404b 0 140px, #323b45 140px 280px, #2e363f 280px 440px, var(--ardosia-escura) 440px);
+    background-attachment: fixed;
+}
+
+/* Selva ao fundo: copas distantes + chão com rio (repetem na horizontal)
+   e árvores com cipós nas laterais. Tudo fixo, atrás do conteúdo. */
+.selva {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='200' viewBox='0 0 320 200' shape-rendering='crispEdges'%3E%3Crect x='0' y='96' width='48' height='104' fill='%232a5442'/%3E%3Crect x='48' y='72' width='32' height='128' fill='%232a5442'/%3E%3Crect x='80' y='104' width='64' height='96' fill='%232a5442'/%3E%3Crect x='144' y='88' width='40' height='112' fill='%232a5442'/%3E%3Crect x='184' y='120' width='80' height='80' fill='%232a5442'/%3E%3Crect x='264' y='80' width='56' height='120' fill='%232a5442'/%3E%3Crect x='0' y='160' width='320' height='40' fill='%23284d3e'/%3E%3Crect x='24' y='168' width='104' height='8' fill='%232d5552'/%3E%3Crect x='176' y='176' width='120' height='8' fill='%232d5552'/%3E%3Crect x='96' y='184' width='64' height='8' fill='%232b4f4c'/%3E%3C/svg%3E") repeat-x left bottom / 320px 200px,
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='448' height='280' viewBox='0 0 448 280' shape-rendering='crispEdges'%3E%3Crect x='0' y='120' width='64' height='160' fill='%2325433a'/%3E%3Crect x='64' y='88' width='48' height='192' fill='%2325433a'/%3E%3Crect x='112' y='136' width='96' height='144' fill='%2325433a'/%3E%3Crect x='208' y='64' width='40' height='216' fill='%2325433a'/%3E%3Crect x='248' y='112' width='88' height='168' fill='%2325433a'/%3E%3Crect x='336' y='152' width='56' height='128' fill='%2325433a'/%3E%3Crect x='392' y='96' width='56' height='184' fill='%2325433a'/%3E%3C/svg%3E") repeat-x 120px bottom / 448px 280px;
+}
+
+.selva-arvore {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    width: auto;
+    max-width: 16vw;
+    opacity: 0.85;
+}
+.selva-arvore.esquerda { left: 0; }
+.selva-arvore.direita  { right: 0; transform: scaleX(-1); }
+
+.pagina {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    margin: 0 auto;
+    background: rgba(43, 50, 58, 0.94);
+}
+
+/* Faixa mais clara do topo: menu + título da página */
+.topo {
+    background: rgba(54, 63, 74, 0.97);
+}
+
+.container {
+    max-width: none;
+    margin: 0;
+    padding: 1.5rem 0 0.5rem;
+}
+
+/* =====================================================================
+   2. Tipografia
+   ===================================================================== */
+
+h1, h2, h3 {
+    font-family: var(--px);
+    font-weight: 500;
+    color: var(--pergaminho);
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+}
+
+h1 { font-size: 2.1rem; margin: 0; }
+h2 { font-size: 1.35rem; margin: 0; }
+
+.subtitulo {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    color: var(--texto-suave);
+}
+
+a { color: var(--ouro); }
+a:hover { color: var(--amarelo); }
+
+/* =====================================================================
+   3. Menu e rodapé
+   ===================================================================== */
 
 .menu {
-    background: #1f2933;
-    margin: -2rem -1rem 1.5rem;   /* encosta no topo, anulando o padding do body */
-    padding: 0.75rem 1rem;
+    margin: 0;
+    padding: 1.4rem 0 1.1rem;
+    border-bottom: 2px solid var(--ardosia);
+    background: none;
 }
 
 .menu-conteudo {
-    max-width: 760px;
-    margin: 0 auto;
+    max-width: none;
+    margin: 0;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem 1rem;
+    gap: 0.5rem 2rem;
 }
 
-.menu a {
-    color: #cbd2d9;
+.menu-marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-right: auto;
+    font-family: var(--px);
+    font-weight: 600;
+    font-size: 1.6rem;
+    letter-spacing: 0.08em;
+    color: var(--pergaminho);
     text-decoration: none;
-    padding: 0.3rem 0.1rem;
+}
+.menu-marca:hover { color: var(--pergaminho); }
+.marca-icone { height: 28px; width: auto; }
+
+.menu nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.menu nav a {
+    font-family: var(--px);
+    font-size: 1.05rem;
+    color: var(--pergaminho);
+    text-decoration: none;
+    padding-bottom: 0.35rem;
     border-bottom: 2px solid transparent;
 }
 
-.menu a:hover,
-.menu a:focus-visible { color: #fff; }
+.menu nav a:hover { color: var(--ouro); }
 
-.menu a.ativo {
-    color: #fff;
-    border-bottom-color: #2563eb;
+.menu nav a.ativo {
+    color: var(--ouro);
+    border-bottom-color: var(--ouro);
 }
 
-.menu .menu-marca {
-    color: #fff;
-    font-weight: 700;
-    margin-right: auto;
+.rodape {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.75rem 0 3rem;
+    font-family: var(--px);
+    font-size: 0.8rem;
+    color: var(--pergaminho);
 }
 
-.aviso {
-    border-left: 4px solid #dc2626;
-    background: #fdecec;
-    padding: 0.6rem 0.9rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
+.rodape-ponto {
+    width: 6px;
+    height: 6px;
+    background: var(--ouro);
 }
 
-.flash {
-    border-left: 4px solid #2563eb;
-    background: #eaf1fe;
-    padding: 0.6rem 0.9rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
+/* =====================================================================
+   4. Painéis (molduras em pixel)
+   ===================================================================== */
+
+section,
+.painel {
+    background: var(--painel);
+    border: 2px solid;
+    border-color: var(--ardosia) var(--selva) var(--selva) var(--ardosia);
+    border-radius: 0;
+    padding: 1.5rem;
+    margin: 0 0 1.5rem;
+    box-shadow: none;
+    clip-path: var(--cortes);
 }
 
-.flash.success { border-color: #16a34a; background: #e8f6ed; }
-.flash.danger  { border-color: #dc2626; background: #fdecec; }
+.cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0;
+    padding: 2rem 0 1.5rem;
+}
+
+.nota {
+    margin: 0 0 1.1rem;
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
+/* =====================================================================
+   5. Botões
+   ===================================================================== */
+
+/* primário: dourado, chanfro de 2px, sombra sólida */
+button,
+.botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border: 0;
+    border-radius: 0;
+    background: var(--ouro);
+    color: #2b2210;
+    font-family: var(--px);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow:
+        inset 2px 2px 0 var(--amarelo),
+        inset -2px -2px 0 #a37712,
+        0 2px 0 var(--sombra);
+    transition: transform 0.1s steps(2), box-shadow 0s;
+}
+
+button:hover,
+.botao:hover {
+    background: var(--ouro);
+    color: #2b2210;
+    transform: translateY(-2px);
+    box-shadow:
+        inset 2px 2px 0 var(--amarelo),
+        inset -2px -2px 0 #a37712,
+        0 4px 0 var(--sombra);
+}
+
+/* secundário: ardósia com borda clara */
+.botao-claro,
+.botao-claro:hover {
+    background: var(--ardosia-escura);
+    color: var(--pergaminho);
+    box-shadow:
+        inset 2px 2px 0 var(--pluma),
+        inset -2px -2px 0 var(--ardosia),
+        0 2px 0 var(--sombra);
+}
+.botao-claro:hover {
+    box-shadow:
+        inset 2px 2px 0 var(--pluma),
+        inset -2px -2px 0 var(--ardosia),
+        0 4px 0 var(--sombra);
+}
+
+/* perigo: só no diálogo de apagar */
+.botao-perigo,
+.botao-perigo:hover {
+    background: var(--vermelho);
+    color: var(--pergaminho);
+    box-shadow:
+        inset 2px 2px 0 #e0604f,
+        inset -2px -2px 0 #8a2419,
+        0 2px 0 var(--sombra);
+}
+.botao-perigo:hover {
+    box-shadow:
+        inset 2px 2px 0 #e0604f,
+        inset -2px -2px 0 #8a2419,
+        0 4px 0 var(--sombra);
+}
+
+/* pressionado: afunda 2px e a sombra sólida some */
+button:active,
+.botao:active {
+    transform: translateY(2px);
+    box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+button:disabled,
+.botao[aria-disabled="true"] {
+    opacity: 0.5;
+    transform: none;
+    cursor: not-allowed;
+}
+
+.botao-pequeno {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+}
+
+.px-mais { height: 12px; width: auto; }
+
+/* foco: contorno dourado */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--ouro);
+    outline-offset: 3px;
+}
+
+/* =====================================================================
+   6. Formulários (campos "rebaixados")
+   ===================================================================== */
+
+form label {
+    display: block;
+    margin-bottom: 1.1rem;
+    font-family: var(--px);
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--pergaminho);
+}
+
+input,
+select,
+textarea {
+    display: block;
+    width: 100%;
+    margin-top: 0.45rem;
+    padding: 0.6rem 0.8rem;
+    border: 2px solid;
+    border-color: var(--sombra) #2f6b4f #2f6b4f var(--sombra);
+    border-radius: 0;
+    background-color: var(--campo);
+    color: var(--texto);
+    font-family: var(--txt);
+    font-size: 0.95rem;
+    font-weight: 400;
+    box-shadow: none;
+    clip-path: var(--cortes);
+}
+
+textarea {
+    min-height: 76px;
+    resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder { color: var(--texto-suave); opacity: 1; }
+
+input:hover,
+select:hover,
+textarea:hover { border-color: var(--sombra) var(--folha) var(--folha) var(--sombra); }
+
+/* no foco a borda vira dourada (o clip-path cortaria um outline externo) */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--ouro);
+    outline: none;
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='5' viewBox='0 0 7 5' shape-rendering='crispEdges'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='1' y='0' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='5' y='0' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='6' y='0' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='0' y='1' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='5' y='1' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='6' y='1' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='1' y='2' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='4' y='2' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='5' y='2' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23efe6cf'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23efe6cf'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    background-size: 14px 10px;
+    cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect x='1' y='0' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='6' y='0' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='0' y='1' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='2' y='1' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='3' y='1' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='4' y='1' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='5' y='1' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='6' y='1' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='7' y='1' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='0' y='2' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='7' y='2' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='0' y='3' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='7' y='3' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='7' y='4' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='0' y='5' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='2' y='5' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='4' y='5' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='7' y='5' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='0' y='6' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='7' y='6' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='0' y='7' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='1' y='7' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='2' y='7' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='3' y='7' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='4' y='7' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='5' y='7' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='6' y='7' width='1' height='1' fill='%23d9a62b'/%3E%3Crect x='7' y='7' width='1' height='1' fill='%23d9a62b'/%3E%3C/svg%3E") center / 14px 14px no-repeat;
+    cursor: pointer;
+}
+
+.campos {
+    display: flex;
+    gap: 1.25rem;
+}
+.campos label { flex: 1; }
+
+.obrigatorio { color: var(--ouro); }
 
 .acoes {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 1rem;
+    gap: 0.9rem;
+    margin-top: 0.4rem;
 }
 
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible {
-    outline: 2px solid #2563eb;
-    outline-offset: 2px;
-}
+/* =====================================================================
+   7. Lista de tarefas e contatos
+   ===================================================================== */
 
-/* ---------- Cabeçalho de página, botões-link e linhas de tabela ---------- */
-.cabecalho {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.cabecalho h1 { margin: 0; }
-
-.botao {
-    display: inline-block;
-    background: #2563eb;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-    padding: 0.55rem 1.1rem;
-}
-
-.botao:hover { background: #1d4ed8; }
-
-.botao-claro {
-    background: #fff;
-    color: #1f2933;
-    border: 1px solid #ccd0d5;
-}
-
-.botao-claro:hover { background: #f4f6f8; }
-
-.botao-pequeno {
-    padding: 0.3rem 0.7rem;
-    font-size: 0.85rem;
-}
-
-.linha-acoes {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.linha-acoes form { margin: 0; }
-
-.tabela-rolagem { overflow-x: auto; }
-
-td.sem-quebra { white-space: nowrap; }
-
-/* ---------- Badges de status ---------- */
-.badge {
-    display: inline-block;
-    padding: 0.15rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.badge-pendente  { background: #fef9c3; color: #854d0e; }  /* 🟡 A fazer  */
-.badge-fazendo   { background: #dbeafe; color: #1e40af; }  /* 🔵 Fazendo  */
-.badge-concluida { background: #dcfce7; color: #166534; }  /* 🟢 Concluída */
-.badge-atrasada  { background: #fee2e2; color: #991b1b; }  /* 🔴 Atrasada  */
-
-/* ---------- Filtro por responsável ---------- */
 .filtro {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     gap: 0.75rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
 }
 
-.filtro label {
-    font-weight: 600;
+.filtro label { margin: 0; }
+.filtro select { min-width: 240px; }
+
+.contagem {
+    margin-left: auto;
+    align-self: flex-end;
+    padding-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
+.aviso-filtro {
+    margin: 0 0 1.5rem;
+    padding: 0.8rem 1rem;
+    border: 2px solid #2f6b4f;
+    border-left-width: 6px;
+    background: rgba(31, 90, 58, 0.14);
     font-size: 0.9rem;
+    clip-path: var(--cortes);
 }
 
-.filtro select {
+.painel-lista { padding: 0.75rem 1.25rem 1rem; }
+
+.tabela-rolagem { overflow-x: auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+    padding: 1.05rem 0.6rem;
+    border-bottom: 1px solid var(--linha);
+    vertical-align: middle;
+}
+
+th {
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--ardosia);
+    font-family: var(--px);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: none;
+    color: var(--ouro);
+}
+
+td {
+    font-size: 0.9rem;
+    color: var(--texto);
+}
+
+tbody tr:last-child td { border-bottom: 0; }
+
+td.sem-quebra { white-space: nowrap; }
+.nome { font-weight: 700; }
+
+.painel-rodape {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
     margin-top: 0.25rem;
-    padding: 0.4rem 0.6rem;
-    border: 1px solid #ccd0d5;
-    border-radius: 4px;
-    font: inherit;
-    background: #fff;
+    padding-top: 0.9rem;
+    border-top: 2px solid var(--linha);
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
+.painel-rodape .lema {
+    font-family: var(--px);
+    color: var(--pergaminho);
+}
+
+/* prioridade: 1 a 3 corações */
+.prioridade {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-family: var(--px);
+    font-size: 0.75rem;
+    color: var(--texto-suave);
+}
+.coracoes { display: flex; gap: 3px; }
+.coracoes .px { height: 12px; width: auto; }
+
+/* status como "item" com ícone de 8x8 */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.55rem;
+    border: 2px solid #5a6470;
+    background: var(--campo);
+    font-family: var(--px);
+    font-size: 0.85rem;
+    color: var(--pergaminho);
+    white-space: nowrap;
+    clip-path: var(--cortes);
+}
+.badge .px { height: 14px; width: auto; }
+
+/* ações da linha: Editar / Apagar */
+.acoes-linha {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+}
+.acoes-linha.lado { flex-direction: row; gap: 1.1rem; }
+.acoes-linha form { margin: 0; }
+
+.acao,
+.acao:hover {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    transform: none;
+    font-family: var(--px);
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--pergaminho);
+    text-decoration: none;
+}
+.acao:hover { color: var(--ouro); }
+.acao:active { transform: translateY(1px); box-shadow: none; }
+.acao .px { height: 13px; width: auto; }
+
+.slot {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--ardosia);
+    background: var(--campo);
+}
+.slot .px { height: 10px; }
+.acao-apagar:hover { color: #e46b5c; }
+.acao-apagar:hover .slot { background: var(--vermelho); border-color: #e0604f; color: var(--pergaminho); }
+
+.acoes-contato {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+}
+
+/* =====================================================================
+   8. Estados vazios, avisos e toasts
+   ===================================================================== */
+
+.vazio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1rem 2.25rem;
+    color: var(--texto-suave);
+}
+.vazio .px-ave { width: 108px; height: auto; margin-bottom: 1.25rem; }
+.vazio h2 { font-size: 1.3rem; margin-bottom: 0.9rem; }
+.vazio p { margin: 0 0 1.25rem; font-size: 0.9rem; color: var(--texto); }
+
+.aviso {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 0 0 1.25rem;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--vermelho);
+    background: rgba(192, 57, 43, 0.12);
+    color: var(--texto);
+    font-size: 0.9rem;
+    clip-path: var(--cortes);
+}
+.aviso .px { height: 16px; width: auto; flex-shrink: 0; }
+
+.flash {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 1.25rem;
+    padding: 0.85rem 1rem;
+    border: 2px solid var(--ouro);
+    background: var(--painel);
+    color: var(--texto);
+    font-size: 0.9rem;
+    clip-path: var(--cortes);
+}
+.flash .px { height: 14px; width: auto; flex-shrink: 0; }
+.flash.success { border-color: #2f6b4f; color: var(--texto); background: var(--painel); }
+.flash.success .px { color: var(--folha); }
+.flash.danger  { border-color: var(--vermelho); color: var(--texto); background: var(--painel); }
+
+/* =====================================================================
+   9. Diálogo de confirmação
+   ===================================================================== */
+
+.dialogo {
+    width: min(380px, calc(100% - 2rem));
+    padding: 1.5rem;
+    border: 2px solid var(--ouro);
+    background: var(--ardosia-escura);
+    color: var(--texto);
+    clip-path: var(--cortes);
+}
+.dialogo::backdrop { background: rgba(18, 21, 25, 0.72); }
+.dialogo .px-harpia { height: 30px; width: auto; margin-bottom: 0.75rem; }
+.dialogo h2 { font-size: 1.45rem; margin-bottom: 0.75rem; }
+.dialogo p { margin: 0 0 1.25rem; font-size: 0.9rem; }
+.dialogo .acoes { margin: 0; }
+
+/* =====================================================================
+   10. Celular
+   ===================================================================== */
+
+@media (max-width: 920px) {
+    .pagina { margin: 0 1rem; }
+}
+
+@media (max-width: 640px) {
+    .pagina { margin: 0; padding: 0 1rem; }
+    .topo { margin: 0 -1rem; padding: 0 1rem; }
+    .menu-marca { font-size: 1.3rem; }
+    .menu nav { gap: 1.25rem; }
+    h1 { font-size: 1.75rem; }
+    .campos { flex-direction: column; gap: 0; }
+    section, .painel { padding: 1.1rem; }
+    .contagem { margin-left: 0; width: 100%; padding: 0; }
+    .filtro select { min-width: 0; }
+    .filtro label { flex: 1; }
+
+    /* tabela vira cards empilhados */
+    .painel-lista thead { display: none; }
+    .painel-lista table, .painel-lista tbody, .painel-lista tr, .painel-lista td { display: block; }
+    .painel-lista tr { padding: 0.9rem 0; border-bottom: 1px solid var(--linha); }
+    .painel-lista tbody tr:last-child { border-bottom: 0; }
+    .painel-lista td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.3rem 0;
+        border: 0;
+    }
+    .painel-lista td::before {
+        content: attr(data-rotulo);
+        font-family: var(--px);
+        font-size: 0.8rem;
+        color: var(--ouro);
+    }
+    .painel-lista td.principal { font-weight: 700; font-size: 1rem; }
+    .painel-lista td.principal::before { display: none; }
+    .acoes-linha, .acoes-contato {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.75rem 1rem;
+    }
+    .prioridade { align-items: flex-end; }
+}
+
+/* =====================================================================
+   11. Animações — tudo em passos (steps), sem suavização
+   ===================================================================== */
+
+/* Crista do logo: sobe em 3 quadros ao carregar a página */
+.marca-icone .crista {
+    animation: erguer-crista 0.45s steps(3) 0.2s both;
+}
+
+/* Olho pisca uma vez no hover da marca */
+.menu-marca:hover .olho { animation: piscar 0.3s steps(1); }
+
+/* Entrada em sequência: título e blocos descem para o lugar em passos de 8px */
+.cabecalho { animation: entrar 0.3s steps(2) both; }
+.container > * { animation: entrar 0.3s steps(2) both 0.08s; }
+.container > :nth-child(2) { animation-delay: 0.16s; }
+.container > :nth-child(3) { animation-delay: 0.24s; }
+.container > :nth-child(n+4) { animation-delay: 0.32s; }
+
+tbody tr {
+    animation: entrar 0.3s steps(2) both;
+    animation-delay: calc(0.3s + min(var(--i, 0), 12) * 0.06s);
+}
+
+/* Atrasada: a caveira pisca devagar */
+.badge .px-caveira,
+.aviso .px-caveira { animation: piscar-caveira 1.6s steps(1) infinite; }
+
+/* Toast sobe 8px ao entrar; o de sucesso some sozinho depois de 3s (script no base.html) */
+.flash { animation: entrar-toast 0.2s steps(2) both; }
+.flash.sumindo { animation: sair-toast 0.3s steps(3) forwards; }
+
+/* Apagar: a linha se desfaz em pixels */
+tbody tr.desfazendo { animation: desfazer 0.4s steps(4) forwards; pointer-events: none; }
+
+.particula {
+    position: fixed;
+    z-index: 50;
+    width: 6px;
+    height: 6px;
+    pointer-events: none;
+    animation: particula 0.6s steps(5) forwards;
+}
+
+.dialogo[open] { animation: entrar-toast 0.2s steps(2) both; }
+
+@keyframes erguer-crista { from { transform: translateY(3px); } to { transform: none; } }
+@keyframes piscar { 0%, 100% { fill: var(--pluma); } }
+@keyframes entrar { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes entrar-toast { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes sair-toast { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes piscar-caveira { 0% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes desfazer {
+    0%   { opacity: 1; }
+    25%  { opacity: 0.75; transform: translateX(4px); }
+    100% { opacity: 0; transform: translateX(16px); }
+}
+@keyframes particula {
+    to { transform: translate(var(--dx, 0), var(--dy, -24px)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after, .dialogo::backdrop {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
