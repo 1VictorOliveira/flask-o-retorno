@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% from "_pixel.html" import icone %}
+
+{% block title %}Relatórios{% endblock %}
+
+{% block cabecalho %}
+    <div class="cabecalho">
+        <div>
+            <h1>Relatórios</h1>
+            <p class="subtitulo">Escolha o que exportar e baixe o relatório em PDF.</p>
+        </div>
+        <a href="{{ url_for('tarefas') }}" class="botao botao-claro">{{ icone('seta') }} Voltar às tarefas</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <section>
+        <form method="post" action="{{ url_for('gerar_relatorio') }}">
+            <label>
+                O que exportar
+                <select name="tipo" required>
+                    <option value="tarefas">Tarefas</option>
+                    <option value="contatos">Contatos</option>
+                </select>
+            </label>
+
+            <div class="campos">
+                <label>
+                    Status
+                    <select name="status">
+                        <option value="todos">Todos</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="fazendo">Fazendo</option>
+                        <option value="concluida">Concluída</option>
+                        <option value="atrasada">Atrasada</option>
+                    </select>
+                </label>
+
+                <label>
+                    Prioridade
+                    <select name="prioridade">
+                        <option value="todas">Todas</option>
+                        <option value="baixa">Baixa</option>
+                        <option value="media">Média</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </label>
+
+                <label>
+                    Responsável
+                    <select name="contato_id">
+                        <option value="">Todos</option>
+                        {% for c in contatos %}
+                        <option value="{{ c.id }}">{{ c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+
+            <div class="campos">
+                <label>
+                    Período de prazo
+                    <input type="date" name="data_inicio" placeholder="De">
+                    <span class="separador">a</span>
+                    <input type="date" name="data_fim" placeholder="Até">
+                </label>
+            </div>
+
+            <div class="acoes">
+                <button type="submit" class="botao">{{ icone('seta') }} Gerar PDF</button>
+                <a href="{{ url_for('tarefas') }}" class="botao botao-claro">{{ icone('lapis') }} Cancelar</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

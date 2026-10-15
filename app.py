@@ -1,10 +1,12 @@
 """Gerenciador de Tarefas — estrutura inicial com Flask e Flask-SQLAlchemy."""
 
+import io
 import os
 from datetime import datetime
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, make_response, redirect, render_template, request, url_for
 from models import db, Contato, Tarefa
+from weasyprint import HTML
 
 app = Flask(__name__)
 
@@ -149,6 +151,78 @@ def deletar_tarefa(id):
     db.session.delete(tarefa)
     db.session.commit()
     return redirect(url_for("tarefas"))
+
+
+# ---------- Relatórios ----------
+
+@app.route("/relatorios")
+def relatorios():
+    """Página com opções de exportação de relatórios."""
+    contatos = Contato.query.order_by(Contato.nome).all()
+    return render_template("relatorios.html", contatos=contatos)
+
+
+@app.route("/relatorios/gerar", methods=["POST"])
+def gerar_relatorio():
+    """Gera um relatório em PDF com base nos filtros escolhidos."""
+    tipo = request.form.get("tipo", "tarefas")
+    status = request.form.get("status", "todos")
+    prioridade = request.form.get("prioridade", "todas")
+    contato_id = request.form.get("contato_id", type=int)
+    data_inicio = request.form.get("data_inicio", "")
+    data_fim = request.form.get("data_fim", "")
+    agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    # Monta a consulta base
+    if tipo == "contatos":
+        query = Contato.query
+        if contato_id:
+            query = query.filter(Contato.id == contato_id)
+        itens = query.order_by(Contato.nome).all()
+        template = "relatorio_contatos.html"
+        contexto = {
+            "contatos": itens,
+            "titulo": "Relatório de Contatos",
+            "agora": agora,
+        }
+    else:
+        query = Tarefa.query
+        if status != "todos":
+            query = query.filter(Tarefa.status == status)
+        if prioridade != "todas":
+            query = query.filter(Tarefa.prioridade == prioridade)
+        if contato_id:
+            query = query.filter(Tarefa.contato_id == contato_id)
+        if data_inicio:
+            query = query.filter(Tarefa.prazo >= data_inicio)
+        if data_fim:
+            query = query.filter(Tarefa.prazo <= data_fim)
+        itens = query.order_by(Tarefa.id.desc()).all()
+        template = "relatorio_tarefas.html"
+        contexto = {
+            "tarefas": itens,
+            "titulo": "Relatório de Tarefas",
+            "filtros": {
+                "status": status,
+                "prioridade": prioridade,
+                "contato": contato_id,
+                "data_inicio": data_inicio,
+                "data_fim": data_fim,
+            },
+            "agora": agora,
+        }
+
+    # Renderiza o HTML do relatório
+    html_renderizado = render_template(template, **contexto)
+
+    # Gera o PDF com WeasyPrint (usa o mesmo CSS do site)
+    pdf_bytes = HTML(string=html_renderizado).write_pdf()
+
+    # Retorna o PDF para download
+    response = make_response(pdf_bytes)
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = f'attachment; filename="{tipo}_{datetime.now().strftime("%Y%m%d")}.pdf"'
+    return response
 
 
 @app.route("/contatos/novo", methods=["GET", "POST"])

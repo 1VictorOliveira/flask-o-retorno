@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titulo }}</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: #fff;
+            color: #1f2933;
+            margin: 0;
+            padding: 1rem;
+            font-size: 12px;
+        }
+
+        .cabecalho-pdf {
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .cabecalho-pdf h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #1f2933;
+        }
+
+        .cabecalho-pdf .subtitulo {
+            margin: 0.25rem 0 0;
+            color: #616e7c;
+            font-size: 0.9rem;
+        }
+
+        .cabecalho-pdf .logo {
+            font-weight: 700;
+            color: #2563eb;
+            font-size: 1.1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 0.6rem 0.5rem;
+            border-bottom: 1px solid #e1e4e8;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: #2563eb;
+            color: #fff;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .resumo {
+            background: #f4f6f8;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .resumo h2 {
+            margin: 0 0 0.75rem;
+            font-size: 1rem;
+            color: #1f2933;
+        }
+
+        .resumo .linha {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .resumo .item {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .resumo .item strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .resumo .item span {
+            font-size: 0.8rem;
+            color: #616e7c;
+        }
+
+        .rodape {
+            margin-top: 2rem;
+            border-top: 1px solid #e1e4e8;
+            padding-top: 0.75rem;
+            font-size: 0.75rem;
+            color: #616e7c;
+            text-align: center;
+        }
+
+        @page {
+            size: A4;
+            margin: 1.5cm 1.5cm 2cm 1.5cm;
+            @bottom-center {
+                content: "Gerenciador de Tarefas — Página " counter(page) " de " counter(pages);
+                font-size: 0.7rem;
+                color: #616e7c;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cabecalho-pdf">
+        <div>
+            <h1>{{ titulo }}</h1>
+            <p class="subtitulo">Gerado em {{ agora }} · Gerenciador de Tarefas</p>
+        </div>
+        <div class="logo">Gestão de Tarefas</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Tarefas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contato in contatos %}
+            <tr>
+                <td>{{ contato.id }}</td>
+                <td>{{ contato.nome }}</td>
+                <td>{{ contato.email }}</td>
+                <td>{{ contato.telefone or '—' }}</td>
+                <td>{{ contato.tarefas | length }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="resumo">
+        <h2>Resumo</h2>
+        <div class="linha">
+            <div class="item">
+                <strong>{{ contatos | length }}</strong>
+                <span>contatos cadastrados</span>
+            </div>
+            <div class="item">
+                <strong>
+                    {% set total_tarefas = 0 %}
+                    {% for c in contatos %}
+                        {% set total_tarefas = total_tarefas + c.tarefas | length %}
+                    {% endfor %}
+                    {{ total_tarefas }}
+                </strong>
+                <span>tarefas vinculadas</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="rodape">
+        Gerado pelo Gerenciador de Tarefas — {{ agora }}
+    </div>
+</body>
+</html>
