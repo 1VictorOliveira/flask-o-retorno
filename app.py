@@ -2,7 +2,7 @@
 
 import io
 import os
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from flask import Flask, flash, make_response, redirect, render_template, request, url_for
 from models import db, Contato, Tarefa
@@ -172,6 +172,13 @@ def gerar_relatorio():
     data_inicio = request.form.get("data_inicio", "")
     data_fim = request.form.get("data_fim", "")
     agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+    usuario = "Administrador do Sistema"
+
+    # Helper para montar texto do filtro de contato
+    contato_nome = None
+    if contato_id:
+        c = db.session.get(Contato, contato_id)
+        contato_nome = c.nome if c else None
 
     # Monta a consulta base
     if tipo == "contatos":
@@ -184,6 +191,11 @@ def gerar_relatorio():
             "contatos": itens,
             "titulo": "Relatório de Contatos",
             "agora": agora,
+            "usuario": usuario,
+            "tipo": tipo,
+            "filtros": {
+                "contato": contato_nome or "Todos",
+            },
         }
     else:
         query = Tarefa.query
@@ -198,18 +210,81 @@ def gerar_relatorio():
         if data_fim:
             query = query.filter(Tarefa.prazo <= data_fim)
         itens = query.order_by(Tarefa.id.desc()).all()
+
+        total = len(itens)
+        concluidas = sum(1 for t in itens if t.status == "concluida")
+        atrasadas = sum(1 for t in itens if t.status == "atrasada")
+        pendentes = sum(1 for t in itens if t.status == "pendente")
+        fazendo = sum(1 for t in itens if t.status == "fazendo")
+        taxa_conclusao = round((concluidas / total) * 100) if total else 0
+
+        # Observações / destaques
+        observacoes = []
+        hoje = date.today()
+        limite_atraso_grave = hoje - timedelta(days=5)
+
+        tarefas_atrasadas_grave = [
+            t for t in itens
+            if t.status != "concluida"
+            and t.prazo is not None
+            and t.prazo < limite_atraso_grave
+        ]
+        if tarefas_atrasadas_grave:
+            observacoes.append(
+                f"{len(tarefas_atrasadas_grave)} tarefa(s) com mais de 5 dias de atraso. "
+                "Recomenda-se revisão urgente dos prazos."
+            )
+
+        tarefas_vencendo_hoje = [
+            t for t in itens
+            if t.status != "concluida"
+            and t.prazo is not None
+            and t.prazo == hoje
+        ]
+        if tarefas_vencendo_hoje:
+            observacoes.append(
+                f"{len(tarefas_vencendo_hoje)} tarefa(s) vencendo hoje. "
+                "Priorize a conclusão para evitar atrasos."
+            )
+
+        if atrasadas:
+            observacoes.append(
+                f"{atrasadas} tarefa(s) estão com status 'Atrasada'. "
+                "Verifique os responsáveis e redefina prazos se necessário."
+            )
+
+        if taxa_conclusao < 50 and total > 0:
+            observacoes.append(
+                f"Taxa de conclusão abaixo de 50% ({taxa_conclusao}%). "
+                "Atenção ao acúmulo de tarefas pendentes."
+            )
+
+        if not observacoes:
+            observacoes.append("Nenhum ponto crítico identificado nos dados filtrados.")
+
         template = "relatorio_tarefas.html"
         contexto = {
             "tarefas": itens,
             "titulo": "Relatório de Tarefas",
             "filtros": {
-                "status": status,
-                "prioridade": prioridade,
-                "contato": contato_id,
-                "data_inicio": data_inicio,
-                "data_fim": data_fim,
+                "status": status.capitalize(),
+                "prioridade": prioridade.capitalize(),
+                "contato": contato_nome or "Todos",
+                "data_inicio": data_inicio or "—",
+                "data_fim": data_fim or "—",
             },
+            "resumo": {
+                "total": total,
+                "concluidas": concluidas,
+                "atrasadas": atrasadas,
+                "pendentes": pendentes,
+                "fazendo": fazendo,
+                "taxa_conclusao": taxa_conclusao,
+            },
+            "observacoes": observacoes,
             "agora": agora,
+            "usuario": usuario,
+            "tipo": tipo,
         }
 
     # Renderiza o HTML do relatório
