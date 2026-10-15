@@ -1,42 +1,60 @@
 {% extends "base.html" %}
+{% from "_pixel.html" import icone %}
 
 {% block title %}Tarefas{% endblock %}
 
-{% block content %}
-    {% set rotulo_prioridade = {'baixa': 'Baixa', 'media': 'Média', 'alta': 'Alta'} %}
-    {% set rotulo_status = {
-        'pendente': '🟡 A fazer',
-        'fazendo': '🔵 Fazendo',
-        'concluida': '🟢 Concluída',
-        'atrasada': '🔴 Atrasada'
-    } %}
+{# link de "Nova tarefa": já leva o responsável do filtro, se houver #}
+{% set novo_link = url_for('nova_tarefa', contato=contato_filtro.id if contato_filtro else none) %}
 
+{% block cabecalho %}
     <div class="cabecalho">
-        <h1>Tarefas</h1>
-        <a href="{{ url_for('nova_tarefa', contato=contato_filtro.id if contato_filtro else none) }}" class="botao">Nova tarefa</a>
+        <div>
+            <h1>Tarefas</h1>
+            <p class="subtitulo">Organize o trabalho da equipe, uma tarefa por vez.</p>
+        </div>
+        <a href="{{ novo_link }}" class="botao">{{ icone('mais') }} Nova tarefa</a>
     </div>
+{% endblock %}
 
-    <form method="get" action="{{ url_for('tarefas') }}" class="filtro">
-        <label>
-            Responsável
-            <select name="contato" onchange="this.form.submit()">
-                <option value="">Todos</option>
-                {% for c in contatos %}
-                <option value="{{ c.id }}" {{ 'selected' if contato_filtro and c.id == contato_filtro.id }}>{{ c.nome }}</option>
-                {% endfor %}
-            </select>
-        </label>
+{% block content %}
+    {# status -> (rótulo, ícone)  |  prioridade -> (rótulo, corações) #}
+    {% set info_status = {
+        'pendente':  ('A fazer',   'ampulheta'),
+        'fazendo':   ('Fazendo',   'picareta'),
+        'concluida': ('Concluída', 'bau'),
+        'atrasada':  ('Atrasada',  'caveira')
+    } %}
+    {% set info_prioridade = {'baixa': ('Baixa', 1), 'media': ('Média', 2), 'alta': ('Alta', 3)} %}
+
+    {% set total = tarefas | length %}
+    {% set concluidas = tarefas | selectattr('status', 'equalto', 'concluida') | list | length %}
+    {% set andamento = tarefas | selectattr('status', 'equalto', 'fazendo') | list | length %}
+
+
+    {% if tarefas or contato_filtro %}
+        <form method="get" action="{{ url_for('tarefas') }}" class="filtro">
+            <label>
+                Responsável
+                <select name="contato" onchange="this.form.submit()">
+                    <option value="">Todos</option>
+                    {% for c in contatos %}
+                    <option value="{{ c.id }}" {{ 'selected' if contato_filtro and c.id == contato_filtro.id }}>{{ c.nome }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            {% if contato_filtro %}
+                <a href="{{ url_for('tarefas') }}" class="botao botao-claro">Limpar filtro</a>
+            {% endif %}
+            <span class="contagem">{{ total }} tarefa{{ 's' if total != 1 }}</span>
+        </form>
+
         {% if contato_filtro %}
-        <a href="{{ url_for('tarefas') }}" class="botao botao-claro botao-pequeno">Limpar filtro</a>
+            <p class="aviso-filtro">Mostrando apenas as tarefas de {{ contato_filtro.nome }}.</p>
         {% endif %}
-    </form>
-
-    {% if contato_filtro %}
-    <p class="flash">Mostrando apenas as tarefas de <strong>{{ contato_filtro.nome }}</strong>.</p>
     {% endif %}
 
-    <section>
-        {% if tarefas %}
+    {% if tarefas %}
+        <section class="painel painel-lista">
             <div class="tabela-rolagem">
                 <table>
                     <thead>
@@ -46,23 +64,35 @@
                             <th>Prazo</th>
                             <th>Prioridade</th>
                             <th>Status</th>
-                            <th></th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for tarefa in tarefas %}
-                        <tr>
-                            <td>{{ tarefa.descricao }}</td>
-                            <td>{{ tarefa.contato.nome if tarefa.contato else '—' }}</td>
-                            <td class="sem-quebra">{{ tarefa.prazo | br_date }}</td>
-                            <td class="prioridade-{{ tarefa.prioridade }}">{{ rotulo_prioridade.get(tarefa.prioridade, tarefa.prioridade) }}</td>
-                            <td><span class="badge badge-{{ tarefa.status }}">{{ rotulo_status.get(tarefa.status, tarefa.status) }}</span></td>
-                            <td class="sem-quebra">
-                                <div class="linha-acoes">
-                                    <a href="{{ url_for('editar_tarefa', id=tarefa.id) }}" class="botao botao-claro botao-pequeno">Editar</a>
+                        {% set st = info_status.get(tarefa.status, (tarefa.status, 'ampulheta')) %}
+                        {% set pr = info_prioridade.get(tarefa.prioridade, ('Média', 2)) %}
+                        <tr style="--i: {{ loop.index0 }}">
+                            <td class="principal" data-rotulo="Descrição">{{ tarefa.descricao }}</td>
+                            <td data-rotulo="Responsável">{{ tarefa.contato.nome if tarefa.contato else '—' }}</td>
+                            <td class="sem-quebra" data-rotulo="Prazo">{{ tarefa.prazo | br_date }}</td>
+                            <td data-rotulo="Prioridade">
+                                <span class="prioridade">
+                                    <span class="coracoes" aria-hidden="true">{% for _ in range(pr[1]) %}{{ icone('coracao') }}{% endfor %}</span>
+                                    {{ pr[0] }}
+                                </span>
+                            </td>
+                            <td data-rotulo="Status">
+                                <span class="badge badge-{{ tarefa.status }}">{{ icone(st[1]) }} {{ st[0] }}</span>
+                            </td>
+                            <td data-rotulo="Ações">
+                                <div class="acoes-linha">
+                                    <a href="{{ url_for('editar_tarefa', id=tarefa.id) }}" class="acao">{{ icone('lapis') }} Editar</a>
                                     <form method="post" action="{{ url_for('deletar_tarefa', id=tarefa.id) }}"
-                                          onsubmit="return confirm('Apagar esta tarefa?');">
-                                        <button type="submit" class="btn-delete">Apagar</button>
+                                          data-confirm="Apagar esta tarefa?"
+                                          data-confirm-detalhe="Esta ação não pode ser desfeita.">
+                                        <button type="submit" class="acao acao-apagar">
+                                            <span class="slot">{{ icone('lixeira') }}</span> Apagar
+                                        </button>
                                     </form>
                                 </div>
                             </td>
@@ -71,8 +101,27 @@
                     </tbody>
                 </table>
             </div>
-        {% else %}
-            <p class="vazio">Nenhuma tarefa cadastrada ainda. Clique em "Nova tarefa" para criar a primeira.</p>
-        {% endif %}
-    </section>
+
+            <div class="painel-rodape">
+                <span>
+                    {{ total }} tarefa{{ 's' if total != 1 }}
+                    {%- if concluidas %} · {{ concluidas }} concluída{{ 's' if concluidas != 1 }}
+                    {%- elif andamento %} · {{ andamento }} em andamento{% endif %}
+                </span>
+                <span class="lema">Toda tarefa tem responsável.</span>
+            </div>
+        </section>
+    {% else %}
+        <section class="painel vazio">
+            {{ icone('ave') }}
+            {% if contato_filtro %}
+                <h2>Nenhuma tarefa de {{ contato_filtro.nome }} ainda.</h2>
+                <p>Crie a primeira para essa pessoa.</p>
+            {% else %}
+                <h2>Nenhuma tarefa ainda.</h2>
+                <p>Crie a primeira.</p>
+            {% endif %}
+            <a href="{{ novo_link }}" class="botao">{{ icone('mais') }} Nova tarefa</a>
+        </section>
+    {% endif %}
 {% endblock %}

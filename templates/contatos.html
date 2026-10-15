@@ -1,15 +1,22 @@
 {% extends "base.html" %}
+{% from "_pixel.html" import icone %}
 
 {% block title %}Contatos{% endblock %}
 
-{% block content %}
+{% block cabecalho %}
     <div class="cabecalho">
-        <h1>Contatos</h1>
-        <a href="{{ url_for('novo_contato') }}" class="botao">Novo contato</a>
+        <div>
+            <h1>Contatos</h1>
+            <p class="subtitulo">As pessoas responsáveis pelas tarefas da equipe.</p>
+        </div>
+        <a href="{{ url_for('novo_contato') }}" class="botao">{{ icone('mais') }} Novo contato</a>
     </div>
+{% endblock %}
 
-    <section>
-        {% if contatos %}
+{% block content %}
+
+    {% if contatos %}
+        <section class="painel painel-lista">
             <div class="tabela-rolagem">
                 <table>
                     <thead>
@@ -17,23 +24,26 @@
                             <th>Nome</th>
                             <th>E-mail</th>
                             <th>Telefone</th>
-                            <th></th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for c in contatos %}
-                        <tr>
-                            <td>{{ c.nome }}</td>
-                            <td>{{ c.email }}</td>
-                            <td class="sem-quebra">{{ c.telefone or '—' }}</td>
-                            <td class="sem-quebra">
-                                <div class="linha-acoes">
-                                    <a href="{{ url_for('nova_tarefa', contato=c.id) }}" class="botao botao-claro botao-pequeno">Nova tarefa</a>
-                                    <a href="{{ url_for('editar_contato', id=c.id) }}" class="botao botao-claro botao-pequeno">Editar</a>
-                                    <form method="post" action="{{ url_for('deletar_contato', id=c.id) }}"
-                                          onsubmit="return confirm('Apagar este contato? As tarefas dele também serão apagadas.');">
-                                        <button type="submit" class="btn-delete">Apagar</button>
-                                    </form>
+                        <tr style="--i: {{ loop.index0 }}">
+                            <td class="principal nome" data-rotulo="Nome">{{ c.nome }}</td>
+                            <td data-rotulo="E-mail">{{ c.email }}</td>
+                            <td class="sem-quebra" data-rotulo="Telefone">{{ c.telefone or '—' }}</td>
+                            <td data-rotulo="Ações">
+                                <div class="acoes-contato">
+                                    <a href="{{ url_for('nova_tarefa', contato=c.id) }}" class="botao botao-claro botao-pequeno">{{ icone('mais') }} Nova tarefa</a>
+                                    <div class="acoes-linha lado">
+                                        <a href="{{ url_for('editar_contato', id=c.id) }}" class="acao">{{ icone('lapis') }} Editar</a>
+                                        <form method="post" action="{{ url_for('deletar_contato', id=c.id) }}"
+                                              data-confirm="Apagar este contato?"
+                                              data-confirm-detalhe="As tarefas dele também serão apagadas.">
+                                            <button type="submit" class="acao acao-apagar">{{ icone('lixeira') }} Apagar</button>
+                                        </form>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -41,8 +51,17 @@
                     </tbody>
                 </table>
             </div>
-        {% else %}
-            <p class="vazio">Nenhum contato cadastrado ainda. Clique em "Novo contato" para cadastrar o primeiro.</p>
-        {% endif %}
-    </section>
+
+            <div class="painel-rodape">
+                <span>{{ contatos | length }} contato{{ 's' if contatos | length != 1 }}</span>
+            </div>
+        </section>
+    {% else %}
+        <section class="painel vazio">
+            {{ icone('ave') }}
+            <h2>Nenhum contato ainda.</h2>
+            <p>Cadastre o primeiro.</p>
+            <a href="{{ url_for('novo_contato') }}" class="botao">{{ icone('mais') }} Novo contato</a>
+        </section>
+    {% endif %}
 {% endblock %}
