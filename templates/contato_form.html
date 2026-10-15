@@ -10,32 +10,45 @@
 
 {% block title %}{{ titulo }}{% endblock %}
 
-{% block content %}
-    <h1>{{ titulo }}</h1>
+{% block cabecalho %}
+    <div class="cabecalho">
+        <div>
+            <h1>{{ titulo }}</h1>
+            <p class="subtitulo">
+                {{ 'Mantenha os dados da pessoa responsável atualizados.' if editando
+                   else 'Cadastre uma pessoa para atribuir tarefas a ela.' }}
+            </p>
+        </div>
+    </div>
+{% endblock %}
 
-    <section>
+{% block content %}
+
+    <section class="painel">
         <form method="post">
+            <p class="nota">* Campos obrigatórios.</p>
+
             <label>
-                Nome
-                <input type="text" name="nome" required maxlength="100"
+                Nome <span class="obrigatorio">*</span>
+                <input type="text" name="nome" required maxlength="100" placeholder="Nome completo"
                        value="{{ contato.nome if editando else '' }}" autofocus>
             </label>
 
             <div class="campos">
                 <label>
-                    E-mail
-                    <input type="email" name="email" required maxlength="120"
+                    E-mail <span class="obrigatorio">*</span>
+                    <input type="email" name="email" required maxlength="120" placeholder="nome@exemplo.com"
                            value="{{ contato.email if editando else '' }}">
                 </label>
                 <label>
                     Telefone
-                    <input type="tel" name="telefone" maxlength="20"
+                    <input type="tel" name="telefone" maxlength="20" placeholder="(00) 00000-0000"
                            value="{{ contato.telefone if (editando and contato.telefone) else '' }}">
                 </label>
             </div>
 
             <div class="acoes">
-                <a href="{{ url_for('contatos') }}">Cancelar</a>
+                <a href="{{ url_for('contatos') }}" class="botao botao-claro">Cancelar</a>
                 <button type="submit">{{ 'Salvar alterações' if editando else 'Salvar contato' }}</button>
             </div>
         </form>

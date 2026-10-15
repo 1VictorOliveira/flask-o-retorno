@@ -4,11 +4,11 @@
       contatos -> lista de Contato (campo "Responsável")
       tarefa   -> a Tarefa sendo editada (não mandar ao criar)
     O form não tem "action": envia para a própria URL.
-    Campos: descricao, prazo (aaaa-mm-dd), prioridade (baixa|media|alta),
+    Campos: descricao, prazo (aaaa-mm-dd, opcional), prioridade (baixa|media|alta),
             status (pendente|fazendo|concluida), contato_id
-    Usa as classes do style.css do Victor (.container, section, label, .campos).
 #}
 {% extends "base.html" %}
+{% from "_pixel.html" import icone %}
 
 {% set editando = tarefa is defined and tarefa %}
 {% set titulo = 'Editar tarefa' if editando else 'Nova tarefa' %}
@@ -16,40 +16,64 @@
 {# Status que a pessoa pode escolher. "atrasada" é calculado pelo sistema. Valor / rótulo: #}
 {% set opcoes_status = [('pendente', 'A fazer'), ('fazendo', 'Fazendo'), ('concluida', 'Concluída')] %}
 
+{% set prazo_atual = tarefa.prazo.strftime('%Y-%m-%d') if (editando and tarefa.prazo) else '' %}
+{% set prioridade_atual = tarefa.prioridade if editando else 'baixa' %}
+{% set contato_atual = tarefa.contato_id if editando else (request.args.get('contato') or 0) | int %}
+{% set status_atual = tarefa.status if (editando and tarefa.status in ['fazendo', 'concluida']) else 'pendente' %}
+{% set atrasada = editando and tarefa.status == 'atrasada' %}
+{% set vindo_de = (contatos | selectattr('id', 'equalto', contato_atual) | first) if (not editando and contato_atual) else none %}
+
+{% if not contatos %}
+    {% set subtitulo = 'Antes de começar, adicione alguém à equipe.' %}
+{% elif atrasada %}
+    {% set subtitulo = 'O atraso é calculado pelo prazo, não pelo status escolhido.' %}
+{% elif editando %}
+    {% set subtitulo = 'Atualize os detalhes e mantenha a equipe alinhada.' %}
+{% elif vindo_de %}
+    {% set subtitulo = 'Iniciada em Contatos · ' ~ vindo_de.nome ~ ' já está selecionada.' %}
+{% else %}
+    {% set subtitulo = 'Defina o que precisa ser feito e quem vai cuidar disso.' %}
+{% endif %}
+
 {% block title %}{{ titulo }}{% endblock %}
 
+{% block cabecalho %}
+    <div class="cabecalho">
+        <div>
+            <h1>{{ titulo }}</h1>
+            <p class="subtitulo">{{ subtitulo }}</p>
+        </div>
+    </div>
+{% endblock %}
+
 {% block content %}
-    {% set prazo_atual = tarefa.prazo.strftime('%Y-%m-%d') if (editando and tarefa.prazo) else '' %}
-    {% set prioridade_atual = tarefa.prioridade if editando else 'media' %}
-    {% set contato_atual = tarefa.contato_id if editando else (request.args.get('contato') or 0) | int %}
-    {% set status_atual = tarefa.status if (editando and tarefa.status in ['fazendo', 'concluida']) else 'pendente' %}
-
-    <h1>{{ titulo }}</h1>
-
-    {% if editando and tarefa.status == 'atrasada' %}
-        <p class="aviso">Esta tarefa está atrasada. Mude o prazo ou marque como concluída.</p>
-    {% endif %}
-
     {% if not contatos %}
-        <section>
-            <p class="vazio">Toda tarefa precisa de um responsável. Cadastre um contato primeiro.</p>
-            <p><a href="{{ url_for('novo_contato') }}">Cadastrar contato</a></p>
+        <section class="painel vazio">
+            {{ icone('ave') }}
+            <h2>Toda tarefa precisa de um responsável.</h2>
+            <p>Cadastre um contato primeiro.</p>
+            <a href="{{ url_for('novo_contato') }}" class="botao">{{ icone('mais') }} Cadastrar contato</a>
         </section>
     {% else %}
-        <section>
+        <section class="painel">
             <form method="post">
+                <p class="nota">* Campos obrigatórios. Toda tarefa tem um responsável.</p>
+
+                {% if atrasada %}
+                    <p class="aviso">{{ icone('caveira') }} Esta tarefa está atrasada. Mude o prazo ou marque como concluída.</p>
+                {% endif %}
+
                 <label>
-                    Descrição
-                    <input type="text" name="descricao" required maxlength="200"
-                           value="{{ tarefa.descricao if editando else '' }}"
-                           placeholder="O que precisa ser feito?" autofocus>
+                    Descrição <span class="obrigatorio">*</span>
+                    <textarea name="descricao" required maxlength="200" rows="3"
+                              placeholder="Descreva a tarefa" autofocus>{{ tarefa.descricao if editando else '' }}</textarea>
                 </label>
 
                 <div class="campos">
                     <label>
-                        Responsável
+                        Responsável <span class="obrigatorio">*</span>
                         <select name="contato_id" required>
-                            <option value="" disabled {{ 'selected' if not contato_atual }}>Escolha um contato</option>
+                            <option value="" disabled {{ 'selected' if not contato_atual }}>Selecione um contato</option>
                             {% for c in contatos %}
                                 <option value="{{ c.id }}" {{ 'selected' if c.id == contato_atual }}>{{ c.nome }}</option>
                             {% endfor %}
@@ -57,7 +81,7 @@
                     </label>
                     <label>
                         Prazo
-                        <input type="date" name="prazo" value="{{ prazo_atual }}" required>
+                        <input type="date" name="prazo" value="{{ prazo_atual }}">
                     </label>
                 </div>
 
@@ -81,7 +105,7 @@
                 </div>
 
                 <div class="acoes">
-                    <a href="{{ url_for('tarefas') }}">Cancelar</a>
+                    <a href="{{ url_for('tarefas') }}" class="botao botao-claro">Cancelar</a>
                     <button type="submit">{{ 'Salvar alterações' if editando else 'Criar tarefa' }}</button>
                 </div>
             </form>
