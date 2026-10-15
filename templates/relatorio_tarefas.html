@@ -480,7 +480,7 @@
                     <td class="descricao">{{ tarefa.descricao }}</td>
                     <td>{{ tarefa.contato.nome if tarefa.contato else '—' }}</td>
                     <td {% if prazo_vencido %}class="prazo-vencido"{% endif %}>
-                        {{ tarefa.prazo.strftime('%d/%m/%Y') if tarefa.prazo else '—' }}
+                        {{ tarefa.prazo | br_date }}
                     </td>
                     <td class="prioridade-{{ tarefa.prioridade }}">{{ tarefa.prioridade | capitalize }}</td>
                     <td><span class="badge badge-{{ tarefa.status }}">{{ tarefa.status | capitalize }}</span></td>
