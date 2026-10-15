@@ -9,70 +9,94 @@
         }
 
         body {
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            background: #fff;
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #ffffff;
             color: #1f2933;
             margin: 0;
-            padding: 1.5rem;
-            font-size: 11px;
-            line-height: 1.4;
+            padding: 2rem;
+            font-size: 10.5px;
+            line-height: 1.5;
+        }
+
+        /* ============ PALETA DE CORES (padrão do site) ============ */
+        :root {
+            --primaria: #2563eb;
+            --primaria-escura: #1d4ed8;
+            --cinza-claro: #f4f6f8;
+            --cinza-borda: #e1e4e8;
+            --cinza-texto: #616e7c;
+            --branco: #ffffff;
         }
 
         /* ============ 1. CABEÇALHO ============ */
         .cabecalho {
-            border-bottom: 4px solid #2563eb;
-            padding-bottom: 1.25rem;
-            margin-bottom: 1.75rem;
+            border-bottom: 3px solid var(--primaria);
+            padding-bottom: 1.2rem;
+            margin-bottom: 1.6rem;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            background: var(--cinza-claro);
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
         }
 
-        .cabecalho-titulo h1 {
-            margin: 0;
-            font-size: 1.6rem;
-            color: #1f2933;
-        }
-
-        .cabecalho-titulo .subtitulo {
-            margin: 0.25rem 0 0;
-            color: #616e7c;
-            font-size: 0.9rem;
-        }
-
-        .cabecalho-dados {
-            text-align: right;
-            font-size: 0.9rem;
-            color: #374151;
-        }
-
-        .cabecalho-dados .linha {
-            margin-bottom: 0.2rem;
+        .cabecalho-esquerda {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .logo {
             font-weight: 800;
-            color: #2563eb;
+            font-size: 1.3rem;
+            color: var(--primaria);
             letter-spacing: 0.5px;
+        }
+
+        .cabecalho-titulo h1 {
+            margin: 0;
+            font-size: 1.7rem;
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .cabecalho-titulo .subtitulo {
+            margin: 0.25rem 0 0;
+            color: var(--cinza-texto);
+            font-size: 0.85rem;
+        }
+
+        .cabecalho-direita {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #374151;
+        }
+
+        .cabecalho-direita .linha {
+            margin-bottom: 0.15rem;
+        }
+
+        .cabecalho-direita strong {
+            color: #111827;
         }
 
         /* ============ 2. CONTEXTO E FILTROS ============ */
         .contexto {
-            background: #f4f6f8;
-            border: 1px solid #e1e4e8;
-            border-left: 4px solid #2563eb;
+            background: var(--branco);
+            border: 1px solid var(--cinza-borda);
+            border-left: 4px solid var(--primaria);
             border-radius: 6px;
             padding: 1rem 1.25rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+            margin-bottom: 1.6rem;
         }
 
         .contexto h2 {
             margin: 0 0 0.75rem;
-            font-size: 1rem;
-            color: #1f2933;
+            font-size: 0.95rem;
+            color: #111827;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
         }
 
         .contexto .grade {
@@ -83,19 +107,20 @@
 
         .contexto .item {
             flex: 1;
-            min-width: 140px;
+            min-width: 130px;
         }
 
         .contexto .item .rotulo {
-            font-size: 0.75rem;
-            color: #616e7c;
+            font-size: 0.7rem;
+            color: var(--cinza-texto);
             text-transform: uppercase;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.15rem;
         }
 
         .contexto .item .valor {
             font-weight: 700;
             color: #111827;
+            font-size: 0.9rem;
         }
 
         /* ============ 3. RESUMO EXECUTIVO ============ */
@@ -103,129 +128,150 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.75rem;
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.6rem;
         }
 
         .resumo-executivo .cartao {
             flex: 1;
-            min-width: 120px;
-            background: #fff;
-            border: 1px solid #e1e4e8;
+            min-width: 110px;
+            background: var(--branco);
+            border: 1px solid var(--cinza-borda);
             border-radius: 6px;
-            padding: 0.85rem 1rem;
+            padding: 0.9rem 1rem;
             text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
 
         .resumo-executivo .cartao .valor {
             display: block;
-            font-size: 1.75rem;
+            font-size: 1.9rem;
             font-weight: 800;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.15rem;
         }
 
         .resumo-executivo .cartao .rotulo {
-            font-size: 0.75rem;
-            color: #616e7c;
+            font-size: 0.68rem;
+            color: var(--cinza-texto);
             text-transform: uppercase;
         }
 
-        .resumo-executivo .cartao.total .valor { color: #2563eb; }
+        .resumo-executivo .cartao.total .valor { color: var(--primaria); }
 
         /* ============ 4. CONTEÚDO PRINCIPAL ============ */
         .conteudo-principal {
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.6rem;
         }
 
         .conteudo-principal h2 {
-            margin: 0 0 1rem;
-            font-size: 1rem;
-            color: #1f2933;
+            margin: 0 0 0.75rem;
+            font-size: 0.95rem;
+            color: #111827;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.85rem;
         }
 
         th,
         td {
             text-align: left;
-            padding: 0.6rem 0.5rem;
-            border-bottom: 1px solid #e1e4e8;
-            font-size: 0.85rem;
+            padding: 0.55rem 0.5rem;
+            border-bottom: 1px solid var(--cinza-borda);
+            vertical-align: middle;
         }
 
         th {
-            background: #2563eb;
+            background: var(--primaria);
             color: #fff;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.3px;
         }
 
         tr:nth-child(even) {
-            background: #f9fafb;
+            background: var(--cinza-claro);
+        }
+
+        tr:hover {
+            background: #eef4fb;
         }
 
         .vazia {
             text-align: center;
-            color: #616e7c;
-            padding: 2rem;
+            color: var(--cinza-texto);
+            padding: 3rem 1rem;
+            font-size: 0.9rem;
         }
 
         /* ============ 5. DESTAQUES OU OBSERVAÇÕES ============ */
         .observacoes {
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.6rem;
         }
 
         .observacoes h2 {
             margin: 0 0 0.75rem;
-            font-size: 1rem;
-            color: #1f2933;
+            font-size: 0.95rem;
+            color: #111827;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
         }
 
         .observacoes ul {
             margin: 0;
-            padding-left: 1.25rem;
+            padding-left: 1.2rem;
+            list-style: none;
         }
 
         .observacoes li {
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
+            margin-bottom: 0.55rem;
+            font-size: 0.88rem;
             color: #374151;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.4;
         }
 
-        .observacoes li::marker {
-            color: #dc2626;
-            font-weight: 700;
+        .observacoes li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primaria);
+            font-weight: 800;
+            font-size: 0.9rem;
         }
 
         /* ============ 6. RODAPÉ ============ */
         .rodape {
             margin-top: 2rem;
-            border-top: 1px solid #e1e4e8;
+            border-top: 1px solid var(--cinza-borda);
             padding-top: 0.75rem;
-            font-size: 0.7rem;
-            color: #616e7c;
+            font-size: 0.68rem;
+            color: var(--cinza-texto);
             display: flex;
             justify-content: space-between;
         }
 
         .rodape-esquerda {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
+        }
+
+        .rodape-direita {
+            font-size: 0.68rem;
+            font-weight: 600;
         }
 
         @page {
             size: A4;
-            margin: 1.5cm 1.5cm 2cm 1.5cm;
+            margin: 1.4cm 1.4cm 1.8cm 1.4cm;
             @bottom-center {
                 content: "Gerenciador de Tarefas — Página " counter(page) " de " counter(pages);
-                font-size: 0.7rem;
-                color: #616e7c;
+                font-size: 0.65rem;
+                color: var(--cinza-texto);
             }
         }
     </style>
@@ -234,14 +280,16 @@
 
     <!-- 1. CABEÇALHO -->
     <div class="cabecalho">
-        <div class="cabecalho-titulo">
-            <div class="logo">Gestão de Tarefas</div>
-            <h1>{{ titulo }}</h1>
-            <p class="subtitulo">Sistema de Gerenciamento de Tarefas</p>
+        <div class="cabecalho-esquerda">
+            <div class="logo">GT</div>
+            <div class="cabecalho-titulo">
+                <h1>{{ titulo }}</h1>
+                <p class="subtitulo">Sistema de Gerenciamento de Tarefas</p>
+            </div>
         </div>
-        <div class="cabecalho-dados">
-            <div class="linha"><strong>Gerado em:</strong> {{ agora }}</p>
-            <div class="linha"><strong>Usuário:</strong> {{ usuario }}</p>
+        <div class="cabecalho-direita">
+            <div class="linha"><strong>Gerado em:</strong> {{ agora }}</div>
+            <div class="linha"><strong>Usuário:</strong> {{ usuario }}</div>
         </div>
     </div>
 
@@ -277,9 +325,9 @@
                 <tr>
                     <th style="width: 5%">#</th>
                     <th style="width: 30%">Nome</th>
-                    <th style="width: 30%">E-mail</th>
+                    <th style="width: 35%">E-mail</th>
                     <th style="width: 20%">Telefone</th>
-                    <th style="width: 15%">Tarefas</th>
+                    <th style="width: 10%">Tarefas</th>
                 </tr>
             </thead>
             <tbody>
@@ -332,7 +380,7 @@
         <div class="rodape-esquerda">
             Origem dos dados: Banco de dados SQLite — Gerenciador de Tarefas
         </div>
-        <div>
+        <div class="rodape-direita">
             Página <span class="page-number"></span>
         </div>
     </div>
