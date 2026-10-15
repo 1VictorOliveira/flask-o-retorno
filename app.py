@@ -65,7 +65,7 @@ def tarefas():
     )
 
 
-@app.route("/tarefas/nova", methods=["GET", "POST"])
+@app.route("/tarefas/cadastrar", methods=["GET", "POST"])
 def nova_tarefa():
     if request.method == "GET":
         return render_template("tarefa_form.html",
