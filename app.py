@@ -1,10 +1,12 @@
 """Gerenciador de Tarefas — estrutura inicial com Flask e Flask-SQLAlchemy."""
 
+import io
 import os
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, make_response, redirect, render_template, request, url_for
 from models import db, Contato, Tarefa
+from weasyprint import HTML
 
 app = Flask(__name__)
 
@@ -149,6 +151,216 @@ def deletar_tarefa(id):
     db.session.delete(tarefa)
     db.session.commit()
     return redirect(url_for("tarefas"))
+
+
+# ---------- Relatórios ----------
+
+@app.route("/relatorios")
+def relatorios():
+    """Página com opções de exportação de relatórios."""
+    contatos = Contato.query.order_by(Contato.nome).all()
+    return render_template(
+        "relatorios.html",
+        contatos=contatos,
+        form_tipo="tarefas",
+        form_status="todos",
+        form_prioridade="todas",
+        form_contato_id=None,
+        form_data_inicio="",
+        form_data_fim="",
+    )
+
+
+def _parse_date(valor):
+    """Converte string de data para objeto date.
+    Aceita formatos: dd/mm/aaaa e aaaa-mm-dd."""
+    if not valor:
+        return None
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(valor, fmt).date()
+        except (ValueError, TypeError):
+            continue
+    return None
+
+
+def _fmt_date(valor):
+    """Formata objeto date como dd/mm/aaaa, ou '—' se None."""
+    if not valor:
+        return "—"
+    if isinstance(valor, str):
+        for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
+            try:
+                valor = datetime.strptime(valor, fmt).date()
+                break
+            except (ValueError, TypeError):
+                continue
+        else:
+            return valor
+    return valor.strftime("%d/%m/%Y")
+
+
+@app.route("/relatorios/gerar", methods=["POST"])
+def gerar_relatorio():
+    """Gera um relatório em PDF com base nos filtros escolhidos."""
+    tipo = request.form.get("tipo", "tarefas")
+    status = request.form.get("status", "todos")
+    prioridade = request.form.get("prioridade", "todas")
+    contato_id = request.form.get("contato_id", type=int)
+    data_inicio_raw = request.form.get("data_inicio", "")
+    data_fim_raw = request.form.get("data_fim", "")
+    agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+    usuario = "Administrador do Sistema"
+
+    # Validação: período não pode ser invertido
+    data_inicio = _parse_date(data_inicio_raw)
+    data_fim = _parse_date(data_fim_raw)
+    erro_periodo = None
+    if data_inicio and data_fim and data_inicio > data_fim:
+        erro_periodo = (
+            "A data inicial não pode ser maior que a data final. "
+            "Corrija o período e tente novamente."
+        )
+        return render_template(
+            "relatorios.html",
+            contatos=Contato.query.order_by(Contato.nome).all(),
+            erro_periodo=erro_periodo,
+            form_tipo=tipo,
+            form_status=status,
+            form_prioridade=prioridade,
+            form_contato_id=contato_id,
+            form_data_inicio=data_inicio_raw,
+            form_data_fim=data_fim_raw,
+        )
+
+    # Helper para montar texto do filtro de contato
+    contato_nome = None
+    if contato_id:
+        c = db.session.get(Contato, contato_id)
+        contato_nome = c.nome if c else None
+
+    # Monta a consulta base
+    if tipo == "contatos":
+        query = Contato.query
+        if contato_id:
+            query = query.filter(Contato.id == contato_id)
+        itens = query.order_by(Contato.nome).all()
+        template = "relatorio_contatos.html"
+        contexto = {
+            "contatos": itens,
+            "titulo": "Relatório de Contatos",
+            "agora": agora,
+            "usuario": usuario,
+            "tipo": tipo,
+            "filtros": {
+                "contato": contato_nome or "Todos",
+            },
+        }
+    else:
+        query = Tarefa.query
+        if status != "todos":
+            query = query.filter(Tarefa.status == status)
+        if prioridade != "todas":
+            query = query.filter(Tarefa.prioridade == prioridade)
+        if contato_id:
+            query = query.filter(Tarefa.contato_id == contato_id)
+        if data_inicio:
+            query = query.filter(Tarefa.prazo >= data_inicio)
+        if data_fim:
+            query = query.filter(Tarefa.prazo <= data_fim)
+        itens = query.order_by(Tarefa.id.desc()).all()
+
+        total = len(itens)
+        concluidas = sum(1 for t in itens if t.status == "concluida")
+        atrasadas = sum(1 for t in itens if t.status == "atrasada")
+        pendentes = sum(1 for t in itens if t.status == "pendente")
+        fazendo = sum(1 for t in itens if t.status == "fazendo")
+        taxa_conclusao = round((concluidas / total) * 100) if total else 0
+
+        # Observações / destaques
+        observacoes = []
+        hoje = date.today()
+        limite_atraso_grave = hoje - timedelta(days=5)
+
+        tarefas_atrasadas_grave = [
+            t for t in itens
+            if t.status != "concluida"
+            and t.prazo is not None
+            and t.prazo < limite_atraso_grave
+        ]
+        if tarefas_atrasadas_grave:
+            observacoes.append(
+                f"{len(tarefas_atrasadas_grave)} tarefa(s) com mais de 5 dias de atraso. "
+                "Recomenda-se revisão urgente dos prazos."
+            )
+
+        tarefas_vencendo_hoje = [
+            t for t in itens
+            if t.status != "concluida"
+            and t.prazo is not None
+            and t.prazo == hoje
+        ]
+        if tarefas_vencendo_hoje:
+            observacoes.append(
+                f"{len(tarefas_vencendo_hoje)} tarefa(s) vencendo hoje. "
+                "Priorize a conclusão para evitar atrasos."
+            )
+
+        if atrasadas:
+            observacoes.append(
+                f"{atrasadas} tarefa(s) estão com status 'Atrasada'. "
+                "Verifique os responsáveis e redefina prazos se necessário."
+            )
+
+        if taxa_conclusao < 50 and total > 0:
+            observacoes.append(
+                f"Taxa de conclusão abaixo de 50% ({taxa_conclusao}%). "
+                "Atenção ao acúmulo de tarefas pendentes."
+            )
+
+        if not observacoes:
+            if total == 0:
+                observacoes.append("Sem dados para análise.")
+            else:
+                observacoes.append("Nenhum ponto crítico identificado nos dados filtrados.")
+
+        template = "relatorio_tarefas.html"
+        contexto = {
+            "tarefas": itens,
+            "titulo": "Relatório de Tarefas",
+            "hoje": hoje,
+            "filtros": {
+                "status": status.capitalize(),
+                "prioridade": prioridade.capitalize(),
+                "contato": contato_nome or "Todos",
+                "data_inicio": _fmt_date(data_inicio_raw),
+                "data_fim": _fmt_date(data_fim_raw),
+            },
+            "resumo": {
+                "total": total,
+                "concluidas": concluidas,
+                "atrasadas": atrasadas,
+                "pendentes": pendentes,
+                "fazendo": fazendo,
+                "taxa_conclusao": taxa_conclusao,
+            },
+            "observacoes": observacoes,
+            "agora": agora,
+            "usuario": usuario,
+            "tipo": tipo,
+        }
+
+    # Renderiza o HTML do relatório
+    html_renderizado = render_template(template, **contexto)
+
+    # Gera o PDF com WeasyPrint (usa o mesmo CSS do site)
+    pdf_bytes = HTML(string=html_renderizado).write_pdf()
+
+    # Retorna o PDF para download
+    response = make_response(pdf_bytes)
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = f'attachment; filename="{tipo}_{datetime.now().strftime("%Y%m%d")}.pdf"'
+    return response
 
 
 @app.route("/contatos/novo", methods=["GET", "POST"])

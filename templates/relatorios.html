@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% from "_pixel.html" import icone %}
+
+{% block title %}Relatórios{% endblock %}
+
+{% block cabecalho %}
+    <div class="cabecalho">
+        <div>
+            <h1>Relatórios</h1>
+            <p class="subtitulo">Escolha o que exportar e baixe o relatório em PDF.</p>
+        </div>
+        <a href="{{ url_for('tarefas') }}" class="botao botao-claro">{{ icone('seta') }} Voltar às tarefas</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if erro_periodo %}
+    <div class="flash flash-danger">
+        {{ erro_periodo }}
+    </div>
+    {% endif %}
+
+    <section>
+        <form method="post" action="{{ url_for('gerar_relatorio') }}">
+            <label>
+                O que exportar
+                <select name="tipo" required>
+                    <option value="tarefas" {% if form_tipo == 'tarefas' %}selected{% endif %}>Tarefas</option>
+                    <option value="contatos" {% if form_tipo == 'contatos' %}selected{% endif %}>Contatos</option>
+                </select>
+            </label>
+
+            <div class="campos">
+                <label>
+                    Status
+                    <select name="status">
+                        <option value="todos" {% if form_status == 'todos' %}selected{% endif %}>Todos</option>
+                        <option value="pendente" {% if form_status == 'pendente' %}selected{% endif %}>Pendente</option>
+                        <option value="fazendo" {% if form_status == 'fazendo' %}selected{% endif %}>Fazendo</option>
+                        <option value="concluida" {% if form_status == 'concluida' %}selected{% endif %}>Concluída</option>
+                        <option value="atrasada" {% if form_status == 'atrasada' %}selected{% endif %}>Atrasada</option>
+                    </select>
+                </label>
+
+                <label>
+                    Prioridade
+                    <select name="prioridade">
+                        <option value="todas" {% if form_prioridade == 'todas' %}selected{% endif %}>Todas</option>
+                        <option value="baixa" {% if form_prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+                        <option value="media" {% if form_prioridade == 'media' %}selected{% endif %}>Média</option>
+                        <option value="alta" {% if form_prioridade == 'alta' %}selected{% endif %}>Alta</option>
+                    </select>
+                </label>
+
+                <label>
+                    Responsável
+                    <select name="contato_id">
+                        <option value="" {% if not form_contato_id %}selected{% endif %}>Todos</option>
+                        {% for c in contatos %}
+                        <option value="{{ c.id }}" {% if form_contato_id == c.id %}selected{% endif %}>{{ c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+
+            <div class="campos">
+                <label>
+                    Período de prazo
+                    <input type="text" name="data_inicio" value="{{ form_data_inicio or '' }}" placeholder="dd/mm/yyyy" maxlength="10" onmask="mascaraData(this)">
+                    <span class="separador">a</span>
+                    <input type="text" name="data_fim" value="{{ form_data_fim or '' }}" placeholder="dd/mm/yyyy" maxlength="10" onmask="mascaraData(this)">
+                </label>
+            </div>
+
+            <div class="acoes">
+                <button type="submit" class="botao">{{ icone('seta') }} Gerar PDF</button>
+                <a href="{{ url_for('tarefas') }}" class="botao botao-claro">{{ icone('lapis') }} Cancelar</a>
+            </div>
+        </form>
+    </section>
+    <script>
+        function mascaraData(input) {
+            let v = input.value.replace(/\D/g, '');
+            if (v.length > 4) v = v.substring(0, 2) + '/' + v.substring(2, 4) + '/' + v.substring(4, 8);
+            else if (v.length > 2) v = v.substring(0, 2) + '/' + v.substring(2, 4);
+            input.value = v.substring(0, 10);
+        }
+        document.querySelectorAll('input[name="data_inicio"], input[name="data_fim"]').forEach(function(input){
+            input.addEventListener('input', function(){ mascaraData(this); });
+        });
+    </script>
+{% endblock %}
