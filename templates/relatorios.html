@@ -20,7 +20,7 @@
     </div>
     {% endif %}
 
-    <section>
+    <section class="painel">
         <form method="post" action="{{ url_for('gerar_relatorio') }}">
             <label>
                 O que exportar
@@ -73,8 +73,8 @@
             </div>
 
             <div class="acoes">
-                <button type="submit" class="botao">{{ icone('seta') }} Gerar PDF</button>
                 <a href="{{ url_for('tarefas') }}" class="botao botao-claro">{{ icone('lapis') }} Cancelar</a>
+                <button type="submit" class="botao">{{ icone('seta') }} Gerar PDF</button>
             </div>
         </form>
     </section>

@@ -691,6 +691,11 @@ td.sem-quebra { white-space: nowrap; }
         align-items: center;
         gap: 0.75rem 1rem;
     }
+    .acoes {
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        justify-content: flex-end;
+    }
     .prioridade { align-items: flex-end; }
 }
 
