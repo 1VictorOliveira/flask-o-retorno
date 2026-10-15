@@ -172,13 +172,16 @@ def relatorios():
 
 
 def _parse_date(valor):
-    """Converte string YYYY-MM-DD para objeto date, ou None se inválida."""
+    """Converte string de data para objeto date.
+    Aceita formatos: dd/mm/aaaa e aaaa-mm-dd."""
     if not valor:
         return None
-    try:
-        return datetime.strptime(valor, "%Y-%m-%d").date()
-    except (ValueError, TypeError):
-        return None
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(valor, fmt).date()
+        except (ValueError, TypeError):
+            continue
+    return None
 
 
 def _fmt_date(valor):
@@ -186,9 +189,13 @@ def _fmt_date(valor):
     if not valor:
         return "—"
     if isinstance(valor, str):
-        try:
-            valor = datetime.strptime(valor, "%Y-%m-%d").date()
-        except (ValueError, TypeError):
+        for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
+            try:
+                valor = datetime.strptime(valor, fmt).date()
+                break
+            except (ValueError, TypeError):
+                continue
+        else:
             return valor
     return valor.strftime("%d/%m/%Y")
 
