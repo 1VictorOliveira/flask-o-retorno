@@ -8,17 +8,21 @@
             box-sizing: border-box;
         }
 
-        body {
+        html, body {
             font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: #ffffff;
             color: #1f2933;
             margin: 0;
-            padding: 2rem;
-            font-size: 10.5px;
-            line-height: 1.5;
+            padding: 0;
+            font-size: 10px;
+            line-height: 1.4;
         }
 
-        /* ============ PALETA DE CORES (padrão do site) ============ */
+        body {
+            padding: 1.4rem;
+        }
+
+        /* ============ PALETA (padrão do site) ============ */
         :root {
             --primaria: #2563eb;
             --primaria-escura: #1d4ed8;
@@ -34,50 +38,81 @@
         /* ============ 1. CABEÇALHO ============ */
         .cabecalho {
             border-bottom: 3px solid var(--primaria);
-            padding-bottom: 1.2rem;
-            margin-bottom: 1.6rem;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--cinza-claro);
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .cabecalho-linha-topo {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            background: var(--cinza-claro);
-            border-radius: 8px;
-            padding: 1.2rem 1.5rem;
+            align-items: center;
         }
 
-        .cabecalho-esquerda {
+        .cabecalho-marca {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
-        .logo {
+        .logo-selo {
+            width: 28px;
+            height: 28px;
+            background: var(--primaria);
+            color: #fff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 800;
-            font-size: 1.3rem;
-            color: var(--primaria);
+            font-size: 12px;
             letter-spacing: 0.5px;
+        }
+
+        .cabecalho-titulo {
+            margin: 0;
         }
 
         .cabecalho-titulo h1 {
             margin: 0;
-            font-size: 1.7rem;
+            font-size: 1.5rem;
             color: #111827;
             font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .cabecalho-titulo .subtitulo {
-            margin: 0.25rem 0 0;
+            margin: 0.15rem 0 0;
             color: var(--cinza-texto);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+        }
+
+        .cabecalho-dados {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #374151;
+        }
+
+        .cabecalho-dados .linha {
+            margin-bottom: 0.1rem;
         }
 
         .cabecalho-direita {
             text-align: right;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #374151;
         }
 
         .cabecalho-direita .linha {
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.1rem;
         }
 
         .cabecalho-direita strong {
@@ -91,71 +126,75 @@
             border-left: 4px solid var(--primaria);
             border-radius: 6px;
             padding: 1rem 1.25rem;
-            margin-bottom: 1.6rem;
+            margin-bottom: 1.5rem;
         }
 
         .contexto h2 {
             margin: 0 0 0.75rem;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #111827;
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
 
         .contexto .grade {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
         }
 
         .contexto .item {
-            flex: 1;
-            min-width: 130px;
+            display: flex;
+            flex-direction: column;
         }
 
         .contexto .item .rotulo {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: var(--cinza-texto);
             text-transform: uppercase;
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.1rem;
         }
 
         .contexto .item .valor {
             font-weight: 700;
             color: #111827;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* ============ 3. RESUMO EXECUTIVO ============ */
         .resumo-executivo {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-bottom: 1.6rem;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .resumo-executivo .cartao {
-            flex: 1;
-            min-width: 110px;
             background: var(--branco);
             border: 1px solid var(--cinza-borda);
             border-radius: 6px;
-            padding: 0.9rem 1rem;
+            padding: 0.6rem 0.5rem;
             text-align: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            min-width: 0;
         }
 
         .resumo-executivo .cartao .valor {
             display: block;
-            font-size: 1.9rem;
+            font-size: 1.7rem;
             font-weight: 800;
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.1rem;
         }
 
         .resumo-executivo .cartao .rotulo {
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             color: var(--cinza-texto);
             text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .resumo-executivo .cartao.total .valor { color: var(--primaria); }
@@ -164,23 +203,39 @@
         .resumo-executivo .cartao.pendentes .valor { color: var(--alerta); }
         .resumo-executivo .cartao.fazendo .valor { color: var(--primaria-escura); }
 
-        .taxa-conclusao {
-            margin-top: 0.6rem;
-            font-size: 0.8rem;
-            color: var(--cinza-texto);
-            font-weight: 600;
-            text-align: center;
+        .barra-progresso {
             width: 100%;
+            height: 6px;
+            background: var(--cinza-claro);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.4rem;
         }
+
+        .barra-progresso .preenchimento {
+            height: 100%;
+            background: var(--sucesso);
+        }
+
+        .texto-taxa {
+            margin-top: 0.2rem;
+            font-size: 0.75rem;
+            color: var(--cinza-texto);
+            text-align: center;
+        }
+
+        /* Estado vazio: cartões em cinza neutro */
+        .estado-vazio .cartao .valor { color: var(--cinza-texto); }
+        .estado-vazio .cartao .rotulo { color: var(--cinza-texto); }
 
         /* ============ 4. CONTEÚDO PRINCIPAL ============ */
         .conteudo-principal {
-            margin-bottom: 1.6rem;
+            margin-bottom: 1.5rem;
         }
 
         .conteudo-principal h2 {
             margin: 0 0 0.75rem;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #111827;
             text-transform: uppercase;
             letter-spacing: 0.4px;
@@ -189,13 +244,17 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
+        }
+
+        thead {
+            display: table-header-group;
         }
 
         th,
         td {
             text-align: left;
-            padding: 0.55rem 0.5rem;
+            padding: 0.5rem 0.4rem;
             border-bottom: 1px solid var(--cinza-borda);
             vertical-align: middle;
         }
@@ -203,7 +262,7 @@
         th {
             background: var(--primaria);
             color: #fff;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 0.3px;
@@ -213,15 +272,15 @@
             background: var(--cinza-claro);
         }
 
-        tr:hover {
-            background: #eef4fb;
+        tr {
+            page-break-inside: avoid;
         }
 
         .badge {
             display: inline-block;
-            padding: 0.12rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.68rem;
+            padding: 0.1rem 0.45rem;
+            border-radius: 10px;
+            font-size: 0.65rem;
             font-weight: 700;
             white-space: nowrap;
             text-transform: uppercase;
@@ -236,6 +295,17 @@
         .prioridade-media  { color: var(--primaria); font-weight: 700; }
         .prioridade-alta   { color: var(--perigo); font-weight: 700; }
 
+        .prazo-vencido {
+            color: var(--perigo);
+            font-weight: 700;
+        }
+
+        .descricao {
+            max-width: 220px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
         .vazia {
             text-align: center;
             color: var(--cinza-texto);
@@ -245,12 +315,12 @@
 
         /* ============ 5. DESTAQUES OU OBSERVAÇÕES ============ */
         .observacoes {
-            margin-bottom: 1.6rem;
+            margin-bottom: 1.5rem;
         }
 
         .observacoes h2 {
             margin: 0 0 0.75rem;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #111827;
             text-transform: uppercase;
             letter-spacing: 0.4px;
@@ -263,8 +333,8 @@
         }
 
         .observacoes li {
-            margin-bottom: 0.55rem;
-            font-size: 0.88rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
             color: #374151;
             padding-left: 1.5rem;
             position: relative;
@@ -285,32 +355,25 @@
             color: var(--sucesso);
         }
 
+        .estado-vazio .observacoes {
+            display: none;
+        }
+
         /* ============ 6. RODAPÉ ============ */
-        .rodape {
-            margin-top: 2rem;
-            border-top: 1px solid var(--cinza-borda);
-            padding-top: 0.75rem;
-            font-size: 0.68rem;
-            color: var(--cinza-texto);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .rodape-esquerda {
-            font-size: 0.68rem;
-        }
-
-        .rodape-direita {
-            font-size: 0.68rem;
-            font-weight: 600;
-        }
-
         @page {
             size: A4;
-            margin: 1.4cm 1.4cm 1.8cm 1.4cm;
-            @bottom-center {
-                content: "Gerenciador de Tarefas — Página " counter(page) " de " counter(pages);
+            margin: 1.4cm 1.4cm 2cm 1.4cm;
+            @bottom-left {
+                content: "Origem dos dados: SQLite — Gerenciador de Tarefas";
+                font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                 font-size: 0.65rem;
+                color: var(--cinza-texto);
+            }
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-size: 0.65rem;
+                font-weight: 600;
                 color: var(--cinza-texto);
             }
         }
@@ -320,16 +383,18 @@
 
     <!-- 1. CABEÇALHO -->
     <div class="cabecalho">
-        <div class="cabecalho-esquerda">
-            <div class="logo">GT</div>
-            <div class="cabecalho-titulo">
-                <h1>{{ titulo }}</h1>
-                <p class="subtitulo">Sistema de Gerenciamento de Tarefas</p>
+        <div class="cabecalho-linha-topo">
+            <div class="cabecalho-marca">
+                <div class="logo-selo">GT</div>
+                <div class="cabecalho-titulo">
+                    <h1>{{ titulo }}</h1>
+                    <p class="subtitulo">Sistema de Gerenciamento de Tarefas</p>
+                </div>
             </div>
-        </div>
-        <div class="cabecalho-direita">
-            <div class="linha"><strong>Gerado em:</strong> {{ agora }}</div>
-            <div class="linha"><strong>Usuário:</strong> {{ usuario }}</div>
+            <div class="cabecalho-direita">
+                <div class="linha"><strong>Gerado em:</strong> {{ agora }}</div>
+                <div class="linha"><strong>Usuário:</strong> {{ usuario }}</div>
+            </div>
         </div>
     </div>
 
@@ -338,7 +403,7 @@
         <h2>Contexto e Filtros Aplicados</h2>
         <div class="grade">
             <div class="item">
-                <span class="rotulo">Tipo de relatório</span>
+                <span class="rotulo">Relatório</span>
                 <span class="valor">{{ tipo | capitalize }}</span>
             </div>
             <div class="item">
@@ -357,14 +422,18 @@
                 <span class="rotulo">Período de prazo</span>
                 <span class="valor">{{ filtros.data_inicio }} a {{ filtros.data_fim }}</span>
             </div>
+            <div class="item">
+                <span class="rotulo">Registros</span>
+                <span class="valor">{{ resumo.total }}</span>
+            </div>
         </div>
     </div>
 
     <!-- 3. RESUMO EXECUTIVO -->
-    <div class="resumo-executivo">
+    <div class="resumo-executivo {% if resumo.total == 0 %}estado-vazio{% endif %}">
         <div class="cartao total">
             <span class="valor">{{ resumo.total }}</span>
-            <span class="rotulo">Total de tarefas</span>
+            <span class="rotulo">Total</span>
         </div>
         <div class="cartao concluidas">
             <span class="valor">{{ resumo.concluidas }}</span>
@@ -383,7 +452,10 @@
             <span class="rotulo">Fazendo</span>
         </div>
     </div>
-    <div class="taxa-conclusao">Taxa de conclusão: {{ resumo.taxa_conclusao }}%</div>
+    <div class="barra-progresso">
+        <div class="preenchimento" style="width: {{ resumo.taxa_conclusao }}%;"></div>
+    </div>
+    <div class="texto-taxa">Taxa de conclusão: {{ resumo.taxa_conclusao }}%</div>
 
     <!-- 4. CONTEÚDO PRINCIPAL -->
     <div class="conteudo-principal">
@@ -393,20 +465,23 @@
             <thead>
                 <tr>
                     <th style="width: 5%">#</th>
-                    <th style="width: 28%">Descrição</th>
+                    <th style="width: 30%">Descrição</th>
                     <th style="width: 17%">Responsável</th>
                     <th style="width: 11%">Prazo</th>
                     <th style="width: 12%">Prioridade</th>
-                    <th style="width: 27%">Status</th>
+                    <th style="width: 25%">Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for tarefa in tarefas %}
+                {% set prazo_vencido = tarefa.prazo is not none and tarefa.prazo < hoje %}
                 <tr>
                     <td>{{ tarefa.id }}</td>
-                    <td>{{ tarefa.descricao }}</td>
+                    <td class="descricao">{{ tarefa.descricao }}</td>
                     <td>{{ tarefa.contato.nome if tarefa.contato else '—' }}</td>
-                    <td>{{ tarefa.prazo.strftime('%d/%m/%Y') if tarefa.prazo else '—' }}</td>
+                    <td {% if prazo_vencido %}class="prazo-vencido"{% endif %}>
+                        {{ tarefa.prazo.strftime('%d/%m/%Y') if tarefa.prazo else '—' }}
+                    </td>
                     <td class="prioridade-{{ tarefa.prioridade }}">{{ tarefa.prioridade | capitalize }}</td>
                     <td><span class="badge badge-{{ tarefa.status }}">{{ tarefa.status | capitalize }}</span></td>
                 </tr>
@@ -416,28 +491,23 @@
         {% else %}
         <div class="vazia">
             <p>Nenhuma tarefa encontrada com os filtros aplicados.</p>
+            <p style="font-size: 0.8rem; margin-top: 0.3rem;">Tente ampliar o período ou remover algum filtro.</p>
         </div>
         {% endif %}
     </div>
 
     <!-- 5. DESTAQUES OU OBSERVAÇÕES -->
-    <div class="observacoes">
+    <div class="observacoes {% if resumo.total == 0 %}estado-vazio{% endif %}">
         <h2>Destaques e Observações</h2>
+        {% if resumo.total == 0 %}
+        <p style="color: var(--cinza-texto); font-size: 0.85rem;">Sem dados para análise.</p>
+        {% else %}
         <ul>
             {% for obs in observacoes %}
             <li{% if 'não' in obs.lower() or 'nenhum' in obs.lower() or 'crítico' in obs.lower() %} class="ok"{% endif %}>{{ obs }}</li>
             {% endfor %}
         </ul>
-    </div>
-
-    <!-- 6. RODAPÉ -->
-    <div class="rodape">
-        <div class="rodape-esquerda">
-            Origem dos dados: Banco de dados SQLite — Gerenciador de Tarefas
-        </div>
-        <div class="rodape-direita">
-            Página <span class="page-number"></span>
-        </div>
+        {% endif %}
     </div>
 
 </body>

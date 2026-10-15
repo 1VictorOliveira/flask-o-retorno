@@ -8,17 +8,21 @@
             box-sizing: border-box;
         }
 
-        body {
+        html, body {
             font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: #ffffff;
             color: #1f2933;
             margin: 0;
-            padding: 2rem;
-            font-size: 10.5px;
-            line-height: 1.5;
+            padding: 0;
+            font-size: 10px;
+            line-height: 1.4;
         }
 
-        /* ============ PALETA DE CORES (padrão do site) ============ */
+        body {
+            padding: 1.4rem;
+        }
+
+        /* ============ PALETA (padrão do site) ============ */
         :root {
             --primaria: #2563eb;
             --primaria-escura: #1d4ed8;
@@ -31,50 +35,71 @@
         /* ============ 1. CABEÇALHO ============ */
         .cabecalho {
             border-bottom: 3px solid var(--primaria);
-            padding-bottom: 1.2rem;
-            margin-bottom: 1.6rem;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--cinza-claro);
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .cabecalho-linha-topo {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            background: var(--cinza-claro);
-            border-radius: 8px;
-            padding: 1.2rem 1.5rem;
+            align-items: center;
         }
 
-        .cabecalho-esquerda {
+        .cabecalho-marca {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
-        .logo {
+        .logo-selo {
+            width: 28px;
+            height: 28px;
+            background: var(--primaria);
+            color: #fff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 800;
-            font-size: 1.3rem;
-            color: var(--primaria);
+            font-size: 12px;
             letter-spacing: 0.5px;
+        }
+
+        .cabecalho-titulo {
+            margin: 0;
         }
 
         .cabecalho-titulo h1 {
             margin: 0;
-            font-size: 1.7rem;
+            font-size: 1.5rem;
             color: #111827;
             font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .cabecalho-titulo .subtitulo {
-            margin: 0.25rem 0 0;
+            margin: 0.15rem 0 0;
             color: var(--cinza-texto);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .cabecalho-direita {
             text-align: right;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #374151;
         }
 
         .cabecalho-direita .linha {
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.1rem;
         }
 
         .cabecalho-direita strong {
@@ -88,83 +113,87 @@
             border-left: 4px solid var(--primaria);
             border-radius: 6px;
             padding: 1rem 1.25rem;
-            margin-bottom: 1.6rem;
+            margin-bottom: 1.5rem;
         }
 
         .contexto h2 {
             margin: 0 0 0.75rem;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #111827;
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
 
         .contexto .grade {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
         }
 
         .contexto .item {
-            flex: 1;
-            min-width: 130px;
+            display: flex;
+            flex-direction: column;
         }
 
         .contexto .item .rotulo {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: var(--cinza-texto);
             text-transform: uppercase;
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.1rem;
         }
 
         .contexto .item .valor {
             font-weight: 700;
             color: #111827;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* ============ 3. RESUMO EXECUTIVO ============ */
         .resumo-executivo {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-bottom: 1.6rem;
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .resumo-executivo .cartao {
-            flex: 1;
-            min-width: 110px;
             background: var(--branco);
             border: 1px solid var(--cinza-borda);
             border-radius: 6px;
-            padding: 0.9rem 1rem;
+            padding: 0.6rem 0.5rem;
             text-align: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            min-width: 0;
         }
 
         .resumo-executivo .cartao .valor {
             display: block;
-            font-size: 1.9rem;
+            font-size: 1.7rem;
             font-weight: 800;
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.1rem;
         }
 
         .resumo-executivo .cartao .rotulo {
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             color: var(--cinza-texto);
             text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .resumo-executivo .cartao.total .valor { color: var(--primaria); }
 
         /* ============ 4. CONTEÚDO PRINCIPAL ============ */
         .conteudo-principal {
-            margin-bottom: 1.6rem;
+            margin-bottom: 1.5rem;
         }
 
         .conteudo-principal h2 {
             margin: 0 0 0.75rem;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #111827;
             text-transform: uppercase;
             letter-spacing: 0.4px;
@@ -173,13 +202,17 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
+        }
+
+        thead {
+            display: table-header-group;
         }
 
         th,
         td {
             text-align: left;
-            padding: 0.55rem 0.5rem;
+            padding: 0.5rem 0.4rem;
             border-bottom: 1px solid var(--cinza-borda);
             vertical-align: middle;
         }
@@ -187,7 +220,7 @@
         th {
             background: var(--primaria);
             color: #fff;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 0.3px;
@@ -197,8 +230,8 @@
             background: var(--cinza-claro);
         }
 
-        tr:hover {
-            background: #eef4fb;
+        tr {
+            page-break-inside: avoid;
         }
 
         .vazia {
@@ -210,12 +243,12 @@
 
         /* ============ 5. DESTAQUES OU OBSERVAÇÕES ============ */
         .observacoes {
-            margin-bottom: 1.6rem;
+            margin-bottom: 1.5rem;
         }
 
         .observacoes h2 {
             margin: 0 0 0.75rem;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #111827;
             text-transform: uppercase;
             letter-spacing: 0.4px;
@@ -228,8 +261,8 @@
         }
 
         .observacoes li {
-            margin-bottom: 0.55rem;
-            font-size: 0.88rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
             color: #374151;
             padding-left: 1.5rem;
             position: relative;
@@ -246,31 +279,20 @@
         }
 
         /* ============ 6. RODAPÉ ============ */
-        .rodape {
-            margin-top: 2rem;
-            border-top: 1px solid var(--cinza-borda);
-            padding-top: 0.75rem;
-            font-size: 0.68rem;
-            color: var(--cinza-texto);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .rodape-esquerda {
-            font-size: 0.68rem;
-        }
-
-        .rodape-direita {
-            font-size: 0.68rem;
-            font-weight: 600;
-        }
-
         @page {
             size: A4;
-            margin: 1.4cm 1.4cm 1.8cm 1.4cm;
-            @bottom-center {
-                content: "Gerenciador de Tarefas — Página " counter(page) " de " counter(pages);
+            margin: 1.4cm 1.4cm 2cm 1.4cm;
+            @bottom-left {
+                content: "Origem dos dados: SQLite — Gerenciador de Tarefas";
+                font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                 font-size: 0.65rem;
+                color: var(--cinza-texto);
+            }
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-size: 0.65rem;
+                font-weight: 600;
                 color: var(--cinza-texto);
             }
         }
@@ -280,16 +302,18 @@
 
     <!-- 1. CABEÇALHO -->
     <div class="cabecalho">
-        <div class="cabecalho-esquerda">
-            <div class="logo">GT</div>
-            <div class="cabecalho-titulo">
-                <h1>{{ titulo }}</h1>
-                <p class="subtitulo">Sistema de Gerenciamento de Tarefas</p>
+        <div class="cabecalho-linha-topo">
+            <div class="cabecalho-marca">
+                <div class="logo-selo">GT</div>
+                <div class="cabecalho-titulo">
+                    <h1>{{ titulo }}</h1>
+                    <p class="subtitulo">Sistema de Gerenciamento de Tarefas</p>
+                </div>
             </div>
-        </div>
-        <div class="cabecalho-direita">
-            <div class="linha"><strong>Gerado em:</strong> {{ agora }}</div>
-            <div class="linha"><strong>Usuário:</strong> {{ usuario }}</div>
+            <div class="cabecalho-direita">
+                <div class="linha"><strong>Gerado em:</strong> {{ agora }}</div>
+                <div class="linha"><strong>Usuário:</strong> {{ usuario }}</div>
+            </div>
         </div>
     </div>
 
@@ -298,12 +322,16 @@
         <h2>Contexto e Filtros Aplicados</h2>
         <div class="grade">
             <div class="item">
-                <span class="rotulo">Tipo de relatório</span>
+                <span class="rotulo">Relatório</span>
                 <span class="valor">{{ tipo | capitalize }}</span>
             </div>
             <div class="item">
                 <span class="rotulo">Responsável</span>
                 <span class="valor">{{ filtros.contato }}</span>
+            </div>
+            <div class="item">
+                <span class="rotulo">Registros</span>
+                <span class="valor">{{ contatos | length }}</span>
             </div>
         </div>
     </div>
@@ -354,35 +382,23 @@
         <h2>Destaques e Observações</h2>
         <ul>
             {% set total_tarefas = 0 %}
-            {% for c in contatos %}
-                {% set total_tarefas = total_tarefas + c.tarefas | length %}
-            {% endfor %}
-            <li>{{ contatos | length }} contato(s) cadastrado(s) no sistema.</li>
-            <li>{{ total_tarefas }} tarefa(s) vinculada(s) a esses contato(s).</li>
             {% set pendentes = 0 %}
             {% for c in contatos %}
+                {% set total_tarefas = total_tarefas + c.tarefas | length %}
                 {% for t in c.tarefas %}
                     {% if t.status != 'concluida' %}
                         {% set pendentes = pendentes + 1 %}
                     {% endif %}
                 {% endfor %}
             {% endfor %}
+            <li>{{ contatos | length }} contato(s) cadastrado(s) no sistema.</li>
+            <li>{{ total_tarefas }} tarefa(s) vinculada(s) a esses contato(s).</li>
             {% if pendentes > 0 %}
             <li>{{ pendentes }} tarefa(s) ainda não concluída(s) vinculada(s) a esses contato(s).</li>
             {% else %}
             <li>Nenhuma tarefa pendente crítica identificada para os contato(s) selecionado(s).</li>
             {% endif %}
         </ul>
-    </div>
-
-    <!-- 6. RODAPÉ -->
-    <div class="rodape">
-        <div class="rodape-esquerda">
-            Origem dos dados: Banco de dados SQLite — Gerenciador de Tarefas
-        </div>
-        <div class="rodape-direita">
-            Página <span class="page-number"></span>
-        </div>
     </div>
 
 </body>

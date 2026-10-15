@@ -162,6 +162,28 @@ def relatorios():
     return render_template("relatorios.html", contatos=contatos)
 
 
+def _parse_date(valor):
+    """Converte string YYYY-MM-DD para objeto date, ou None se inválida."""
+    if not valor:
+        return None
+    try:
+        return datetime.strptime(valor, "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return None
+
+
+def _fmt_date(valor):
+    """Formata objeto date como dd/mm/aaaa, ou '—' se None."""
+    if not valor:
+        return "—"
+    if isinstance(valor, str):
+        try:
+            valor = datetime.strptime(valor, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            return valor
+    return valor.strftime("%d/%m/%Y")
+
+
 @app.route("/relatorios/gerar", methods=["POST"])
 def gerar_relatorio():
     """Gera um relatório em PDF com base nos filtros escolhidos."""
@@ -169,10 +191,31 @@ def gerar_relatorio():
     status = request.form.get("status", "todos")
     prioridade = request.form.get("prioridade", "todas")
     contato_id = request.form.get("contato_id", type=int)
-    data_inicio = request.form.get("data_inicio", "")
-    data_fim = request.form.get("data_fim", "")
+    data_inicio_raw = request.form.get("data_inicio", "")
+    data_fim_raw = request.form.get("data_fim", "")
     agora = datetime.now().strftime("%d/%m/%Y %H:%M")
     usuario = "Administrador do Sistema"
+
+    # Validação: período não pode ser invertido
+    data_inicio = _parse_date(data_inicio_raw)
+    data_fim = _parse_date(data_fim_raw)
+    erro_periodo = None
+    if data_inicio and data_fim and data_inicio > data_fim:
+        erro_periodo = (
+            "A data inicial não pode ser maior que a data final. "
+            "Corrija o período e tente novamente."
+        )
+        return render_template(
+            "relatorios.html",
+            contatos=Contato.query.order_by(Contato.nome).all(),
+            erro_periodo=erro_periodo,
+            form_tipo=tipo,
+            form_status=status,
+            form_prioridade=prioridade,
+            form_contato_id=contato_id,
+            form_data_inicio=data_inicio_raw,
+            form_data_fim=data_fim_raw,
+        )
 
     # Helper para montar texto do filtro de contato
     contato_nome = None
@@ -260,18 +303,22 @@ def gerar_relatorio():
             )
 
         if not observacoes:
-            observacoes.append("Nenhum ponto crítico identificado nos dados filtrados.")
+            if total == 0:
+                observacoes.append("Sem dados para análise.")
+            else:
+                observacoes.append("Nenhum ponto crítico identificado nos dados filtrados.")
 
         template = "relatorio_tarefas.html"
         contexto = {
             "tarefas": itens,
             "titulo": "Relatório de Tarefas",
+            "hoje": hoje,
             "filtros": {
                 "status": status.capitalize(),
                 "prioridade": prioridade.capitalize(),
                 "contato": contato_nome or "Todos",
-                "data_inicio": data_inicio or "—",
-                "data_fim": data_fim or "—",
+                "data_inicio": _fmt_date(data_inicio_raw),
+                "data_fim": _fmt_date(data_fim_raw),
             },
             "resumo": {
                 "total": total,

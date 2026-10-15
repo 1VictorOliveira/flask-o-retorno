@@ -14,13 +14,19 @@
 {% endblock %}
 
 {% block content %}
+    {% if erro_periodo %}
+    <div class="flash flash-danger">
+        {{ erro_periodo }}
+    </div>
+    {% endif %}
+
     <section>
         <form method="post" action="{{ url_for('gerar_relatorio') }}">
             <label>
                 O que exportar
                 <select name="tipo" required>
-                    <option value="tarefas">Tarefas</option>
-                    <option value="contatos">Contatos</option>
+                    <option value="tarefas" {% if form_tipo == 'tarefas' %}selected{% endif %}>Tarefas</option>
+                    <option value="contatos" {% if form_tipo == 'contatos' %}selected{% endif %}>Contatos</option>
                 </select>
             </label>
 
@@ -28,30 +34,30 @@
                 <label>
                     Status
                     <select name="status">
-                        <option value="todos">Todos</option>
-                        <option value="pendente">Pendente</option>
-                        <option value="fazendo">Fazendo</option>
-                        <option value="concluida">Concluída</option>
-                        <option value="atrasada">Atrasada</option>
+                        <option value="todos" {% if form_status == 'todos' %}selected{% endif %}>Todos</option>
+                        <option value="pendente" {% if form_status == 'pendente' %}selected{% endif %}>Pendente</option>
+                        <option value="fazendo" {% if form_status == 'fazendo' %}selected{% endif %}>Fazendo</option>
+                        <option value="concluida" {% if form_status == 'concluida' %}selected{% endif %}>Concluída</option>
+                        <option value="atrasada" {% if form_status == 'atrasada' %}selected{% endif %}>Atrasada</option>
                     </select>
                 </label>
 
                 <label>
                     Prioridade
                     <select name="prioridade">
-                        <option value="todas">Todas</option>
-                        <option value="baixa">Baixa</option>
-                        <option value="media">Média</option>
-                        <option value="alta">Alta</option>
+                        <option value="todas" {% if form_prioridade == 'todas' %}selected{% endif %}>Todas</option>
+                        <option value="baixa" {% if form_prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+                        <option value="media" {% if form_prioridade == 'media' %}selected{% endif %}>Média</option>
+                        <option value="alta" {% if form_prioridade == 'alta' %}selected{% endif %}>Alta</option>
                     </select>
                 </label>
 
                 <label>
                     Responsável
                     <select name="contato_id">
-                        <option value="">Todos</option>
+                        <option value="" {% if not form_contato_id %}selected{% endif %}>Todos</option>
                         {% for c in contatos %}
-                        <option value="{{ c.id }}">{{ c.nome }}</option>
+                        <option value="{{ c.id }}" {% if form_contato_id == c.id %}selected{% endif %}>{{ c.nome }}</option>
                         {% endfor %}
                     </select>
                 </label>
@@ -60,9 +66,9 @@
             <div class="campos">
                 <label>
                     Período de prazo
-                    <input type="date" name="data_inicio" placeholder="De">
+                    <input type="date" name="data_inicio" value="{{ form_data_inicio or '' }}" placeholder="De">
                     <span class="separador">a</span>
-                    <input type="date" name="data_fim" placeholder="Até">
+                    <input type="date" name="data_fim" value="{{ form_data_fim or '' }}" placeholder="Até">
                 </label>
             </div>
 
